@@ -33,6 +33,8 @@ const nunjucksConfigure = nunjucks.configure('server/templates', {
 const AutoEscapeExtension = require("nunjucks-autoescape")(nunjucks);
 nunjucksConfigure.addExtension('AutoEscapeExtension', new AutoEscapeExtension(nunjucksConfigure));
 
+app.use(express.static('browser/public'));
+
 const router = require('./server/routes');
 app.use('/', router);
 

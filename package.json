@@ -10,17 +10,39 @@
     "express": "^4.16.2",
     "morgan": "^1.9.0",
     "nunjucks": "^3.0.1",
-    "nunjucks-autoescape": "^1.0.1"
+    "nunjucks-autoescape": "^1.0.1",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-redux": "^5.0.7",
+    "react-router-dom": "^4.2.2",
+    "redux": "^3.7.2",
+    "redux-thunk": "^2.2.0"
   },
   "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
     "chai": "^4.1.2",
     "chai-http": "^3.0.0",
     "mocha": "^5.0.1",
-    "nodemon": "^1.14.12"
+    "nodemon": "^1.14.12",
+    "redux-devtools-extension": "^2.13.2",
+    "redux-logger": "^3.0.6",
+    "webpack": "^3.11.0"
+  },
+  "babel": {
+    "presets": [
+      "env",
+      "react",
+      "stage-2"
+    ]
   },
   "scripts": {
     "start": "node app.js",
     "dev": "./node_modules/nodemon/bin/nodemon.js app.js",
+    "webpack": "./node_modules/webpack/bin/webpack.js -w",
     "test": "mocha"
   },
   "repository": {
