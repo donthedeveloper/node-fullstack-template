@@ -4,6 +4,7 @@
   "description": "",
   "main": "app.js",
   "dependencies": {
+    "bcrypt": "^1.0.3",
     "body-parser": "^1.18.2",
     "client-sessions": "^0.8.0",
     "dotenv": "^5.0.0",
@@ -16,7 +17,8 @@
     "react-redux": "^5.0.7",
     "react-router-dom": "^4.2.2",
     "redux": "^3.7.2",
-    "redux-thunk": "^2.2.0"
+    "redux-thunk": "^2.2.0",
+    "sequelize": "^4.33.4"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
