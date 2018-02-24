@@ -12,6 +12,7 @@
     "morgan": "^1.9.0",
     "nunjucks": "^3.0.1",
     "nunjucks-autoescape": "^1.0.1",
+    "pg": "^7.4.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-redux": "^5.0.7",
@@ -45,7 +46,8 @@
     "start": "node app.js",
     "dev": "./node_modules/nodemon/bin/nodemon.js app.js",
     "webpack": "./node_modules/webpack/bin/webpack.js -w",
-    "test": "mocha"
+    "test": "mocha",
+    "seed": "node ./server/models/seed.js"
   },
   "repository": {
     "type": "git",

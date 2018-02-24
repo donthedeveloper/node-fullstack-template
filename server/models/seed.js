@@ -1,3 +1,4 @@
+require('dotenv').config();
 const {db, User} = require('./index');
 
 const chalk = require('chalk');
@@ -17,6 +18,9 @@ db.sync({force:true})
 
         // CREATE USERS
         return User.bulkCreate(users, {individualHooks: true})
+    })
+    .finally(() => {
+        db.close();
     })
     .catch((err) => {
         console.error('There was totally a problem:', err);
