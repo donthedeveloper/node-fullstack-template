@@ -26,7 +26,7 @@ const USERADD = 'user_add';
 const USEREDIT = 'user_edit';
 const USERDELETE = 'user_delete';
 
-const permission = [
+const permissions = [
     {name: USERADD},
     {name: USEREDIT},
     {name: USERDELETE}
@@ -36,7 +36,7 @@ db.sync({force:true})
     .then(() => {
         console.log(chalk.blue('Dropped old data.'));
         // CREATE ROLES
-        return roles.bulkCreate(roles, {individualHooks: true});
+        return Role.bulkCreate(roles, {individualHooks: true});
     })
     .then(() => {
         console.log(chalk.blue('Created roles'));
@@ -48,8 +48,19 @@ db.sync({force:true})
             const roleIdArr = [];
             switch (permission.name) {
                 case USERADD:
-                // TODO: BUILD LINKS IN RELATIONSHIP TABLE
+                    roleIdArr.push(1, 2);
+                    break;
+                case USEREDIT:
+                    roleIdArr.push(1, 2);
+                    break;
+                case USERDELETE:
+                    roleIdArr.push(2);
+                    break;
             }
+
+            roleIdArr.forEach((roleId) => {
+                permission.addRole(roleId);
+            });
         })
     })
     .then(() => {

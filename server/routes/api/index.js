@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
 
-const {User} = require('../../models');
+const userApi = require('./user');
+const loginApi = require('./login');
+const logoutApi = require('./logout');
+const whoAmI = require('./whoami');
 
-// get all users from database
-router.get('/', (req, res) => {
-    User.findAll()
-        .then(res.send)
-        .catch(console.error);
-});
+router.use('./user', userApi);
+router.use('./login', loginApi);
+router.use('./logout', logoutApi);
+router.use('./whoami', whoAmIApi);
 
 module.exports = router;
