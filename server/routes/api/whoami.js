@@ -27,3 +27,5 @@ router.get('/', (req, res) => {
         console.error(err.message);
     });
 });
+
+module.exports = router;
