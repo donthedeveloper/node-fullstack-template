@@ -44,13 +44,14 @@
     ]
   },
   "scripts": {
-    "dev": "./node_modules/nodemon/bin/nodemon.js app.js",
+    "dev": "npm run start-dev & npm run webpack-watch & npm run sass & npm run sass-watch",
     "sass": "./node_modules/node-sass/bin/node-sass --recursive browser/src/sass --output browser/public/css",
     "sass-watch": "./node_modules/node-sass/bin/node-sass --watch --recursive browser/src/sass --output browser/public/css",
     "seed": "node ./server/models/seed.js",
     "start": "node app.js",
+    "start-dev": "./node_modules/nodemon/bin/nodemon.js app.js",
     "test": "mocha",
-    "webpack": "./node_modules/webpack/bin/webpack.js -w"
+    "webpack-watch": "./node_modules/webpack/bin/webpack.js -w"
   },
   "repository": {
     "type": "git",
