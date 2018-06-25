@@ -29,9 +29,8 @@
     "babel-preset-stage-2": "^6.24.1",
     "chai": "^4.1.2",
     "chai-http": "^3.0.0",
-    "gulp": "^3.9.1",
-    "gulp-sass": "^4.0.1",
     "mocha": "^5.0.1",
+    "node-sass": "^4.9.0",
     "nodemon": "^1.14.12",
     "redux-devtools-extension": "^2.13.2",
     "redux-logger": "^3.0.6",
@@ -45,12 +44,13 @@
     ]
   },
   "scripts": {
-    "start": "node app.js",
     "dev": "./node_modules/nodemon/bin/nodemon.js app.js",
-    "webpack": "./node_modules/webpack/bin/webpack.js -w",
-    "gulp": "./node_modules/gulp/bin/gulp.js sass:watch",
+    "sass": "./node_modules/node-sass/bin/node-sass --recursive browser/src/sass --output browser/public/css",
+    "sass-watch": "./node_modules/node-sass/bin/node-sass --watch --recursive browser/src/sass --output browser/public/css",
+    "seed": "node ./server/models/seed.js",
+    "start": "node app.js",
     "test": "mocha",
-    "seed": "node ./server/models/seed.js"
+    "webpack": "./node_modules/webpack/bin/webpack.js -w"
   },
   "repository": {
     "type": "git",
