@@ -58,5 +58,6 @@ typings/
 .env
 
 # bundles
+application.css
 bundle.js
 bundle.js.map
