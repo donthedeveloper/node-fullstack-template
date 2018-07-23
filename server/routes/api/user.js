@@ -1,35 +1,22 @@
 const express = require('express');
 const router = express.Router();
 
-const {User} = require('../../models');
-
 router.post('/', (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
 
-    if (!email || !password) {
-        // TODO: return proper status
+    if (!email || password) {
+        const err = new Error('All fields required.');
+        res.status = 400;
+        return next(err);
     }
 
-    User.findOrCreate({
-        where: {
-            email: email
-        },
-        defaults: {
-            email: email,
-            password: password
+    User.create({email, password}, (error, user) => {
+        if (error) {
+            return next(error);
         }
-    })
-    .then((user) => {
-        if (user[1]) {
-            // TODO: confirm proper status
-            res.sendStatus(200);
-        } else {
-            // TODO: return proper status
-        }
-    })
-    .catch((err) => {
-        // TODO: return proper status
+        req.session.userId = user._id;
+        res.sendStatus(201);
     });
 });
 

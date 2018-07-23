@@ -1,23 +1,16 @@
 const express = require('express');
 const router = express.Router();
+const User = require('../../models/user');
 
-const {User, Role} = require('../../models');
-
-router.post('/', (req, res) => {
+router.post('/', (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
 
-    User.findOne({
-        where: {email}
-    })
-    .then((user) => {
-        if (user && user.validPassword(password)) {
-
-        }
-    })
-    .catch((err) => {
-        console.error(err)
-    });
+    if (!email || password) {
+        const err = new Error('All fields required.');
+        res.status = 400;
+        return next(err);
+    }
 });
 
 module.exports = router;
