@@ -14,13 +14,14 @@ const UserSchema = new mongoose.Schema({
     }
 });
 
-UserSchema.pre('save', (next) => {
-    const password = user.password;
+UserSchema.pre('save', function(next) {
+    let password = this.password;
+    console.log('password:', password);
     bcrypt.hash(password, 10, (err, hash) => {
         if (err) {
             return next(err);
         }
-        user.password = hash;
+        password = hash;
         next();
     });
 });

@@ -6,11 +6,21 @@ const express = require('express'),
 const mongoose = require('mongoose');
 const morgan = require('morgan');
 const nunjucks = require('nunjucks');
-const session = require('express-session');
+const session = require('express-session'),
+  MongoStore = require('connect-mongo')(session);
 
 mongoose.connect('mongodb://localhost:27017/fstemplate');
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
+
+app.use(session({
+  secret: 'TODO: make this an env var',
+  resave: true,
+  saveUnitialized: false,
+  store: new MongoStore({
+    mongooseConnection: db
+  })
+}));
 
 // middleware
 app.use(morgan('dev'));
