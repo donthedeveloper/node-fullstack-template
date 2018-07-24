@@ -11,7 +11,7 @@ router.use('/logout', logoutApi);
 
 // API Catchall Error Handler
 router.use((req, res, next) => {
-  const err = new Error('Route not found');
+  const err = new Error('Route not found.');
   err.status = 404;
   next(err);
 });

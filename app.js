@@ -46,19 +46,6 @@ app.use(express.static('browser/public'));
 const router = require('./server/routes');
 app.use('/', router);
 
-// app.use((req, res, next) => {
-//   const err = new Error('File Not Found');
-//   err.status = 404;
-//   next(err);
-// });
-
-// app.use((err, req, res, next) => {
-//   res.status(err.status || 500);
-//   res.json({
-//     message: err.message
-//   })
-// });
-
 app.listen(process.env.PORT || 3000, function() {
     console.log(chalk.green(`App is listening on port ${this.address().port}`));
 });
