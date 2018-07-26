@@ -8,7 +8,7 @@ router.post('/', (req, res, next) => {
 
     if (!email || !password) {
         const err = new Error('All fields required.');
-        res.status = 400;
+        err.status = 400;
         return next(err);
     }
 

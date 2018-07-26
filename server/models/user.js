@@ -6,7 +6,7 @@ const UserSchema = new mongoose.Schema({
         required: true,
         trim: true,
         type: String,
-        unique: true,
+        unique: true // TODO: set up custom error message, possibly catch the error code in the route and build a custom message
     },
     password: {
         required: true,

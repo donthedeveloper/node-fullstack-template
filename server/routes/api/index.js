@@ -10,6 +10,13 @@ router.use('/login', loginApi);
 router.use('/logout', logoutApi);
 
 // API Catchall Error Handler
+router.use((err, req, res, next) => {
+  if (err.code === 11000) {
+    err.status = 400;
+  }
+  next(err);
+});
+
 router.use((req, res, next) => {
   const err = new Error('Route not found.');
   err.status = 404;
@@ -17,7 +24,7 @@ router.use((req, res, next) => {
 });
 
 router.use((err, req, res, next) => {
-  res.status = err.status || 500;
+  res.status(err.status || 500);
   res.json({
     message: err.message
   })
