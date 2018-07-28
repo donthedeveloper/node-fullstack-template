@@ -4,11 +4,30 @@ const router = express.Router();
 const userApi = require('./user');
 const loginApi = require('./login');
 const logoutApi = require('./logout');
-const whoAmIApi = require('./whoami');
 
-router.use('./user', userApi);
-router.use('./login', loginApi);
-router.use('./logout', logoutApi);
-router.use('./whoami', whoAmIApi);
+router.use('/user', userApi);
+router.use('/login', loginApi);
+router.use('/logout', logoutApi);
+
+// API Catchall Error Handler
+router.use((err, req, res, next) => {
+  if (err.code === 11000) {
+    err.status = 400;
+  }
+  next(err);
+});
+
+router.use((req, res, next) => {
+  const err = new Error('Route not found.');
+  err.status = 404;
+  next(err);
+});
+
+router.use((err, req, res, next) => {
+  res.status(err.status || 500);
+  res.json({
+    message: err.message
+  })
+});
 
 module.exports = router;

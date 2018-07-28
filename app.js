@@ -1,24 +1,32 @@
 require('dotenv').config();
-const express = require('express');
-const app = express();
-const morgan = require('morgan');
 const bodyParser = require('body-parser');
-const session = require('client-sessions');
-const nunjucks = require('nunjucks');
 const chalk = require('chalk');
+const express = require('express'),
+  app = express();
+const mongoose = require('mongoose');
+const morgan = require('morgan');
+const nunjucks = require('nunjucks');
+const session = require('express-session'),
+  MongoStore = require('connect-mongo')(session);
+
+mongoose.connect('mongodb://localhost:27017/fstemplate');
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+
+app.use(session({
+  secret: 'TODO: make this an env var',
+  resave: true,
+  saveUnitialized: false,
+  store: new MongoStore({
+    mongooseConnection: db
+  })
+}));
 
 // middleware
-app.use(morgan('dev'));
+// app.use(morgan('dev'));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
-app.use(session({
-  cookieName: 'session',
-  secret: 'random_string',
-  duration: 30 * 60 * 1000,
-  activeDuration: 5 * 60 * 100
-}));
 
 app.engine('html', nunjucks.render);
 app.set('view engine', 'html');
