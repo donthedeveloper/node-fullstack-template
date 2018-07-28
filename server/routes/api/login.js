@@ -6,10 +6,8 @@ router.post('/', (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
 
-    console.log('session:', req.session);
-
     if (!email || !password) {
-        const err = new Error('All fields are required.');
+        const err = new Error('All fields required.');
         err.status = 400;
         return next(err);
     }
