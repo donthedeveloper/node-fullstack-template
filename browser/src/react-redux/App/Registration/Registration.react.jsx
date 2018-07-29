@@ -1,34 +1,9 @@
 import axios from 'axios';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {setEmail, setErrorMessage, setPassword} from './Login.actions';
-import {setUser} from '../User.actions';
+import {setEmail, setErrorMessage, setPassword} from './Registration.actions';
 
-class Login extends Component {
-    // componentDidMount = () => {
-    //     const user = this.props.user;
-    //     if (user) {
-    //         this.redirectWhenLoggedIn();
-    //     }
-    // }
-
-    authenticate = () => {
-        const {email, password} = this.props;
-        axios.post('/api/login', {email, password})
-            .then(() => {
-                // TODO: make get whoami call and redirect after
-                this.redirectWhenLoggedIn();
-            })
-            .catch((err) => {
-                this.props.setErrorMessage(err.response.data.message);
-            });
-    };
-
-    handleSubmit = (e) => {
-        e.preventDefault();
-        this.authenticate();
-    };
-
+class Registration extends Component {
     handleOnEmailChange = (e) => {
         this.props.setEmail(e.target.value);
     };
@@ -37,12 +12,23 @@ class Login extends Component {
         this.props.setPassword(e.target.value);
     };
 
-    redirectWhenLoggedIn() {
-        this.props.history.push('/profile');
+    handleSubmit = (e) => {
+        e.preventDefault();
+        this.sendRegistrationData(e);
+    }
+
+    sendRegistrationData = () => {
+        const {email, password} = this.props;
+        axios.post('/api/user', {email, password})
+            .then((res) => {
+                this.props.history.push('/api/profile');
+            })
+            .catch((err) => {
+                this.props.setErrorMessage(err.response.data.message);
+            });
     }
 
     render() {
-        // TODO: <Redirect> if user object is populated with ID
         return (
             <form onSubmit={this.handleSubmit}>
                 <p>{this.props.errorMessage}</p>
@@ -62,7 +48,7 @@ class Login extends Component {
                     type='password'
                     value={this.props.password}
                 />
-                <input type='submit' value='Login' />
+                <input type='submit' value='Register' />
             </form>
         );
     }
@@ -71,8 +57,7 @@ class Login extends Component {
 const mapStateToProps = (state) => ({
     email: state.loginReducer.email,
     errorMessage: state.loginReducer.errorMessage,
-    password: state.loginReducer.password,
-    user: state.user
+    password: state.loginReducer.password
 });
 
-export default connect(mapStateToProps, {setEmail, setErrorMessage, setPassword, setUser})(Login);
+export default connect(mapStateToProps, {setEmail, setErrorMessage, setPassword})(Registration);
