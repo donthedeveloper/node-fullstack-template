@@ -1,28 +1,37 @@
 import axios from 'axios';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import {Redirect} from 'react-router';
 import {setEmail, setErrorMessage, setPassword} from './Login.actions';
 import {setUser} from '../User.actions';
 
 class Login extends Component {
-    // componentDidMount = () => {
-    //     const user = this.props.user;
-    //     if (user) {
-    //         this.redirectWhenLoggedIn();
-    //     }
-    // }
+    componentDidMount = () => {
+        if (!this.props.user) {
+            this.updateStoreWithUser();
+        }
+    }
 
     authenticate = () => {
         const {email, password} = this.props;
         axios.post('/api/login', {email, password})
             .then(() => {
-                // TODO: make get whoami call and redirect after
-                this.redirectWhenLoggedIn();
+                this.updateStoreWithUser();
             })
             .catch((err) => {
                 this.props.setErrorMessage(err.response.data.message);
             });
     };
+
+    updateStoreWithUser() {
+        axios.get('/api/whoami')
+            .then((res) => {
+                this.props.setUser(res.data.user);
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+    }
 
     handleSubmit = (e) => {
         e.preventDefault();
@@ -42,7 +51,10 @@ class Login extends Component {
     }
 
     render() {
-        // TODO: <Redirect> if user object is populated with ID
+        if (this.props.user) {
+            return <Redirect to='/profile' />
+        }
+
         return (
             <form onSubmit={this.handleSubmit}>
                 <p>{this.props.errorMessage}</p>

@@ -1,9 +1,17 @@
 import axios from 'axios';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {setEmail, setErrorMessage, setPassword} from './Registration.actions';
+import {Redirect} from 'react-router';
+import {setEmail, setErrorMessage, setPassword} from './Signup.actions';
+import {setUser} from '../User.actions';
 
-class Registration extends Component {
+class Signup extends Component {
+    componentDidMount = () => {
+        if (!this.props.user) {
+            this.updateStoreWithUser();
+        }
+    }
+
     handleOnEmailChange = (e) => {
         this.props.setEmail(e.target.value);
     };
@@ -14,21 +22,39 @@ class Registration extends Component {
 
     handleSubmit = (e) => {
         e.preventDefault();
-        this.sendRegistrationData(e);
+        this.sendSignupData(e);
     }
 
-    sendRegistrationData = () => {
+    redirectWhenLoggedIn() {
+        this.props.history.push('/profile');
+    }
+
+    sendSignupData = () => {
         const {email, password} = this.props;
         axios.post('/api/user', {email, password})
             .then((res) => {
-                this.props.history.push('/api/profile');
+                this.updateStoreWithUser();
             })
             .catch((err) => {
                 this.props.setErrorMessage(err.response.data.message);
             });
     }
 
+    updateStoreWithUser() {
+        axios.get('/api/whoami')
+            .then((res) => {
+                this.props.setUser(res.data.user);
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+    }
+
     render() {
+        if (this.props.user) {
+            return <Redirect to='/profile' />
+        }
+
         return (
             <form onSubmit={this.handleSubmit}>
                 <p>{this.props.errorMessage}</p>
@@ -57,7 +83,8 @@ class Registration extends Component {
 const mapStateToProps = (state) => ({
     email: state.loginReducer.email,
     errorMessage: state.loginReducer.errorMessage,
-    password: state.loginReducer.password
+    password: state.loginReducer.password,
+    user: state.user
 });
 
-export default connect(mapStateToProps, {setEmail, setErrorMessage, setPassword})(Registration);
+export default connect(mapStateToProps, {setEmail, setErrorMessage, setPassword, setUser})(Signup);
