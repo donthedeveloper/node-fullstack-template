@@ -1,6 +1,7 @@
-const SET_EMAIL = 'SET_EMAIL';
-const SET_ERROR_MESSAGE = 'SET_ERROR_MESSAGE';
-const SET_PASSWORD = 'SET_PASSWORD';
+// TODO: share constants file with actions
+const SET_LOGIN_EMAIL = 'SET_LOGIN_EMAIL';
+const SET_LOGIN_ERROR_MESSAGE = 'SET_LOGIN_ERROR_MESSAGE';
+const SET_LOGIN_PASSWORD = 'SET_LOGIN_PASSWORD';
 
 const initialState = {
     email: '',
@@ -12,13 +13,13 @@ export default (state=initialState, action) => {
     const newState = Object.assign({}, state);
 
     switch(action.type) {
-        case SET_EMAIL:
+        case SET_LOGIN_EMAIL:
             newState.email = action.email;
             break;
-        case SET_ERROR_MESSAGE:
+        case SET_LOGIN_ERROR_MESSAGE:
             newState.errorMessage = action.error;
             break;
-        case SET_PASSWORD:
+        case SET_LOGIN_PASSWORD:
             newState.password = action.password;
             break;
         default:

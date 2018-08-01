@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
-const mongoose = require('mongoose');
+// TODO: get rid of debug
+const mongoose = require('mongoose').set('debug', true);
 
 const UserSchema = new mongoose.Schema({
     email: {

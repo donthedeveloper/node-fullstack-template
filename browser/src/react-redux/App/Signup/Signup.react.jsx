@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
-import {setEmail, setErrorMessage, setPassword} from './Signup.actions';
+import {resetSignupState, setSignupEmail, setSignupErrorMessage, setSignupPassword} from './Signup.actions';
 import {setUser} from '../User.actions';
 
 class Signup extends Component {
@@ -13,11 +13,11 @@ class Signup extends Component {
     }
 
     handleOnEmailChange = (e) => {
-        this.props.setEmail(e.target.value);
+        this.props.setSignupEmail(e.target.value);
     };
 
     handleOnPasswordChange = (e) => {
-        this.props.setPassword(e.target.value);
+        this.props.setSignupPassword(e.target.value);
     };
 
     handleSubmit = (e) => {
@@ -34,15 +34,18 @@ class Signup extends Component {
         axios.post('/api/user', {email, password})
             .then((res) => {
                 this.updateStoreWithUser();
+                this.props.resetSignupState();
             })
             .catch((err) => {
-                this.props.setErrorMessage(err.response.data.message);
+                this.props.setSignupErrorMessage(err.response.data.message);
             });
     }
 
     updateStoreWithUser() {
+        console.log('kasdjflda');
         axios.get('/api/whoami')
             .then((res) => {
+                console.log('res:', res);
                 this.props.setUser(res.data.user);
             })
             .catch((err) => {
@@ -81,10 +84,10 @@ class Signup extends Component {
 }
 
 const mapStateToProps = (state) => ({
-    email: state.loginReducer.email,
-    errorMessage: state.loginReducer.errorMessage,
-    password: state.loginReducer.password,
+    email: state.signupReducer.email,
+    errorMessage: state.signupReducer.errorMessage,
+    password: state.signupReducer.password,
     user: state.user
 });
 
-export default connect(mapStateToProps, {setEmail, setErrorMessage, setPassword, setUser})(Signup);
+export default connect(mapStateToProps, {resetSignupState, setSignupEmail, setSignupErrorMessage, setSignupPassword, setUser})(Signup);

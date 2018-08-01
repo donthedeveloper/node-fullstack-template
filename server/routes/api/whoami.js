@@ -8,17 +8,23 @@ router.get('/', (req, res, next) => {
     if (!userId) {
         return res.send({user: null});
     }
+    console.log('session:', req.session);
     console.log('userId:', userId);
 
     return User.findById(userId)
         .exec((error, user) => {
             if (error) {
                 return next(error);
-            } else {
-                // TODO: send only id & email
-                console.log('user:', user);
-                return res.send({user: null});
             }
+
+            // TODO: find out if user isnt found, what is returned. null?
+            return user ? res.send({user: user}) : res.send({user: null});
+
+            // else {
+            //     // TODO: send only id & email
+            //     console.log('uh oh where is the user');
+            //     return res.send({user: null});
+            // }
         });
 });
 

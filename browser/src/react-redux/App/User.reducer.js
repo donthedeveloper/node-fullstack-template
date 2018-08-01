@@ -8,7 +8,7 @@ export default (state=initialState, action) => {
     switch(action.type) {
         case SET_USER:
             const user = action.user;
-            return user ? action.Object.assign({}, action.user) : null;
+            return user ? Object.assign({}, action.user) : state;
             break;
         default:
             return state;

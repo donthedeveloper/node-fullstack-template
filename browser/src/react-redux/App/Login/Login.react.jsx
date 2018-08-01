@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
-import {setEmail, setErrorMessage, setPassword} from './Login.actions';
+import {setLoginEmail, setLoginErrorMessage, setLoginPassword} from './Login.actions';
 import {setUser} from '../User.actions';
 
 class Login extends Component {
@@ -17,15 +17,17 @@ class Login extends Component {
         axios.post('/api/login', {email, password})
             .then(() => {
                 this.updateStoreWithUser();
+                // TODO: reset login state, also build actions and update reducer with new actions for reset
             })
             .catch((err) => {
-                this.props.setErrorMessage(err.response.data.message);
+                this.props.setLoginErrorMessage(err.response.data.message);
             });
     };
 
     updateStoreWithUser() {
         axios.get('/api/whoami')
             .then((res) => {
+                console.log('user:', res.data.user);
                 this.props.setUser(res.data.user);
             })
             .catch((err) => {
@@ -39,11 +41,11 @@ class Login extends Component {
     };
 
     handleOnEmailChange = (e) => {
-        this.props.setEmail(e.target.value);
+        this.props.setLoginEmail(e.target.value);
     };
 
     handleOnPasswordChange = (e) => {
-        this.props.setPassword(e.target.value);
+        this.props.setLoginPassword(e.target.value);
     };
 
     redirectWhenLoggedIn() {
@@ -87,4 +89,4 @@ const mapStateToProps = (state) => ({
     user: state.user
 });
 
-export default connect(mapStateToProps, {setEmail, setErrorMessage, setPassword, setUser})(Login);
+export default connect(mapStateToProps, {setLoginEmail, setLoginErrorMessage, setLoginPassword, setUser})(Login);
