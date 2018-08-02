@@ -2,6 +2,7 @@
 const SET_LOGIN_EMAIL = 'SET_LOGIN_EMAIL';
 const SET_LOGIN_ERROR_MESSAGE = 'SET_LOGIN_ERROR_MESSAGE';
 const SET_LOGIN_PASSWORD = 'SET_LOGIN_PASSWORD';
+const RESET_LOGIN_STATE = 'RESET_SIGNUP_STATE';
 
 const initialState = {
     email: '',
@@ -13,6 +14,8 @@ export default (state=initialState, action) => {
     const newState = Object.assign({}, state);
 
     switch(action.type) {
+        case RESET_LOGIN_STATE:
+            return initialState;
         case SET_LOGIN_EMAIL:
             newState.email = action.email;
             break;

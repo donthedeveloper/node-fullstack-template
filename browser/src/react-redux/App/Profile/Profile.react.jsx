@@ -1,45 +1,16 @@
 import axios from 'axios';
 import PropTypes from 'prop-types';
-import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Redirect} from 'react-router';
-import {resetSignupState, setSignupEmail, setSignupErrorMessage, setSignupPassword} from './Signup.actions';
+import React, {Component} from 'react';
 import {setUser} from '../User.actions';
 
-class Signup extends Component {
+class Profile extends Component {
     componentDidMount = () => {
         if (!this.props.user) {
             this.updateStoreWithUser();
         }
     }
 
-    handleOnEmailChange = (e) => {
-        this.props.setSignupEmail(e.target.value);
-    };
-
-    handleOnPasswordChange = (e) => {
-        this.props.setSignupPassword(e.target.value);
-    };
-
-    handleSubmit = (e) => {
-        e.preventDefault();
-        this.sendSignupData(e);
-    }
-
-    // TODO: make into a thunk
-    sendSignupData = () => {
-        const {email, password} = this.props;
-        axios.post('/api/user', {email, password})
-            .then((res) => {
-                this.updateStoreWithUser();
-                this.props.resetSignupState();
-            })
-            .catch((err) => {
-                this.props.setSignupErrorMessage(err.response.data.message);
-            });
-    }
-
-    // TODO: make into a thunk
     updateStoreWithUser() {
         axios.get('/api/whoami')
             .then((res) => {
@@ -47,14 +18,13 @@ class Signup extends Component {
             })
             .catch((err) => {
                 console.error(err);
+            })
+            .finally(() => {
+                this.props.history.push('/login');
             });
     }
 
     render() {
-        if (this.props.user) {
-            return <Redirect to='/profile' />
-        }
-
         return (
             <form onSubmit={this.handleSubmit}>
                 <p>{this.props.errorMessage}</p>
@@ -74,13 +44,13 @@ class Signup extends Component {
                     type='password'
                     value={this.props.password}
                 />
-                <input type='submit' value='Register' />
+                <input type='submit' value='Login' />
             </form>
         );
     }
 }
 
-Signup.propTypes = {
+Profile.propTypes = {
     email: PropTypes.string,
     errorMessage: PropTypes.string,
     password: PropTypes.string,
@@ -92,10 +62,10 @@ Signup.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-    email: state.signupReducer.email,
-    errorMessage: state.signupReducer.errorMessage,
-    password: state.signupReducer.password,
+    // email: state.loginReducer.email,
+    // errorMessage: state.loginReducer.errorMessage,
+    // password: state.loginReducer.password,
     user: state.user
 });
 
-export default connect(mapStateToProps, {resetSignupState, setSignupEmail, setSignupErrorMessage, setSignupPassword, setUser})(Signup);
+export default connect(mapStateToProps, {setUser})(Profile);

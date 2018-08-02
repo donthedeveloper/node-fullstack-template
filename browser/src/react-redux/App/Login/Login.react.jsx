@@ -1,43 +1,20 @@
-import axios from 'axios';
+import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
-import {setLoginEmail, setLoginErrorMessage, setLoginPassword} from './Login.actions';
+import {authenticate, resetLoginState, setLoginEmail, setLoginErrorMessage, setLoginPassword, updateStoreWithUser} from './Login.actions';
 import {setUser} from '../User.actions';
 
 class Login extends Component {
     componentDidMount = () => {
         if (!this.props.user) {
-            this.updateStoreWithUser();
+            this.props.updateStoreWithUser();
         }
-    }
-
-    authenticate = () => {
-        const {email, password} = this.props;
-        axios.post('/api/login', {email, password})
-            .then(() => {
-                this.updateStoreWithUser();
-                // TODO: reset login state, also build actions and update reducer with new actions for reset
-            })
-            .catch((err) => {
-                this.props.setLoginErrorMessage(err.response.data.message);
-            });
-    };
-
-    updateStoreWithUser() {
-        axios.get('/api/whoami')
-            .then((res) => {
-                console.log('user:', res.data.user);
-                this.props.setUser(res.data.user);
-            })
-            .catch((err) => {
-                console.error(err);
-            });
     }
 
     handleSubmit = (e) => {
         e.preventDefault();
-        this.authenticate();
+        this.props.authenticate(this.props.email, this.props.password);
     };
 
     handleOnEmailChange = (e) => {
@@ -47,10 +24,6 @@ class Login extends Component {
     handleOnPasswordChange = (e) => {
         this.props.setLoginPassword(e.target.value);
     };
-
-    redirectWhenLoggedIn() {
-        this.props.history.push('/profile');
-    }
 
     render() {
         if (this.props.user) {
@@ -82,6 +55,17 @@ class Login extends Component {
     }
 }
 
+Login.propTypes = {
+    email: PropTypes.string,
+    errorMessage: PropTypes.string,
+    password: PropTypes.string,
+    user: PropTypes.shape({
+        _id: PropTypes.string,
+        email: PropTypes.string,
+        password: PropTypes.string
+    })
+};
+
 const mapStateToProps = (state) => ({
     email: state.loginReducer.email,
     errorMessage: state.loginReducer.errorMessage,
@@ -89,4 +73,4 @@ const mapStateToProps = (state) => ({
     user: state.user
 });
 
-export default connect(mapStateToProps, {setLoginEmail, setLoginErrorMessage, setLoginPassword, setUser})(Login);
+export default connect(mapStateToProps, {authenticate, resetLoginState, setLoginEmail, setLoginErrorMessage, setLoginPassword, setUser, updateStoreWithUser})(Login);
