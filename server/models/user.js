@@ -35,15 +35,34 @@ UserSchema.statics.authenticate = function(email, password, callback) {
         });
 }
 
-UserSchema.pre('save', function(next) {
-    let password = this.password;
-    bcrypt.hash(password, 10, (err, hash) => {
-        if (err) {
-            return next(err);
-        }
-        this.password = hash;
+UserSchema.pre('findOneAndUpdate', function(next) {
+    const password = this.getUpdate().password;
+    if (password) {
+        bcrypt.hash(password, 10, (err, hash) => {
+            if (err) {
+                return next(err);
+            }
+            this.update({}, {password: hash});
+            next();
+        });
+    } else {
         next();
-    });
+    }
+});
+
+UserSchema.pre('save', function(next) {
+    const password = this.password;
+    if (password) {
+        bcrypt.hash(password, 10, (err, hash) => {
+            if (err) {
+                return next(err);
+            }
+            this.password = hash;
+            next();
+        });
+    } else {
+        next();
+    }
 });
 
 const User = mongoose.model('User', UserSchema);

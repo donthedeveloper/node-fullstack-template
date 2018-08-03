@@ -2,26 +2,21 @@ import axios from 'axios';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import React, {Component} from 'react';
-import {setUser} from '../User.actions';
+import {updateStoreWithUser} from '../User.actions';
 
 class Profile extends Component {
-    componentDidMount = () => {
+    componentDidMount = async () => {
         if (!this.props.user) {
-            this.updateStoreWithUser();
+            // TODO: possibly add option callback parameter to updateStoreWithUser function to redirect on empty user
+            await this.props.updateStoreWithUser();
+            if (!this.props.user) {
+                this.props.history.push('/login');
+            }
         }
     }
 
-    updateStoreWithUser() {
-        axios.get('/api/whoami')
-            .then((res) => {
-                this.props.setUser(res.data.user);
-            })
-            .catch((err) => {
-                console.error(err);
-            })
-            .finally(() => {
-                this.props.history.push('/login');
-            });
+    handleSubmit = (e) => {
+        e.preventDefault();
     }
 
     render() {
@@ -40,11 +35,17 @@ class Profile extends Component {
                 <input
                     id='password'
                     onChange={this.handleOnPasswordChange}
-                    required
                     type='password'
                     value={this.props.password}
                 />
-                <input type='submit' value='Login' />
+                <label htmlFor='confirmPassword'>Confirm Password</label>
+                <input
+                    id='confirmPassword'
+                    onChange={this.handleOnConfirmPasswordChange}
+                    type='password'
+                    value={this.props.confirmPassword}
+                />
+                <input type='submit' value='Update' />
             </form>
         );
     }
@@ -54,6 +55,7 @@ Profile.propTypes = {
     email: PropTypes.string,
     errorMessage: PropTypes.string,
     password: PropTypes.string,
+    confirmPassword: PropTypes.string,
     user: PropTypes.shape({
         _id: PropTypes.string,
         email: PropTypes.string,
@@ -62,10 +64,11 @@ Profile.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-    // email: state.loginReducer.email,
-    // errorMessage: state.loginReducer.errorMessage,
-    // password: state.loginReducer.password,
+    email: state.profileReducer.email,
+    errorMessage: state.profileReducer.errorMessage,
+    password: state.profileReducer.password,
+    confirmPassword: state.profileReducer.confirmPassword,
     user: state.user
 });
 
-export default connect(mapStateToProps, {setUser})(Profile);
+export default connect(mapStateToProps, {updateStoreWithUser})(Profile);
