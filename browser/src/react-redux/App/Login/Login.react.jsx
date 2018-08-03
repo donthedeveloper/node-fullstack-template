@@ -2,8 +2,8 @@ import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
-import {authenticate, resetLoginState, setLoginEmail, setLoginErrorMessage, setLoginPassword, updateStoreWithUser} from './Login.actions';
-import {setUser} from '../User.actions';
+import {authenticate, setLoginEmail, setLoginPassword} from './Login.actions';
+import {updateStoreWithUser} from '../User.actions';
 
 class Login extends Component {
     componentDidMount = () => {
@@ -64,6 +64,7 @@ Login.propTypes = {
         email: PropTypes.string,
         password: PropTypes.string
     })
+    // TODO: check action creators attached to props
 };
 
 const mapStateToProps = (state) => ({
@@ -73,4 +74,4 @@ const mapStateToProps = (state) => ({
     user: state.user
 });
 
-export default connect(mapStateToProps, {authenticate, resetLoginState, setLoginEmail, setLoginErrorMessage, setLoginPassword, setUser, updateStoreWithUser})(Login);
+export default connect(mapStateToProps, {authenticate, setLoginEmail, setLoginPassword, updateStoreWithUser})(Login);

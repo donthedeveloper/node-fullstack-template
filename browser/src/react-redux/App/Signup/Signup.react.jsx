@@ -1,15 +1,14 @@
-import axios from 'axios';
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
-import {resetSignupState, setSignupEmail, setSignupErrorMessage, setSignupPassword} from './Signup.actions';
-import {setUser} from '../User.actions';
+import {sendSignupData, setSignupEmail, setSignupPassword} from './Signup.actions';
+import {updateStoreWithUser} from '../User.actions';
 
 class Signup extends Component {
     componentDidMount = () => {
         if (!this.props.user) {
-            this.updateStoreWithUser();
+            this.props.updateStoreWithUser();
         }
     }
 
@@ -23,31 +22,7 @@ class Signup extends Component {
 
     handleSubmit = (e) => {
         e.preventDefault();
-        this.sendSignupData(e);
-    }
-
-    // TODO: make into a thunk
-    sendSignupData = () => {
-        const {email, password} = this.props;
-        axios.post('/api/user', {email, password})
-            .then((res) => {
-                this.updateStoreWithUser();
-                this.props.resetSignupState();
-            })
-            .catch((err) => {
-                this.props.setSignupErrorMessage(err.response.data.message);
-            });
-    }
-
-    // TODO: make into a thunk
-    updateStoreWithUser() {
-        axios.get('/api/whoami')
-            .then((res) => {
-                this.props.setUser(res.data.user);
-            })
-            .catch((err) => {
-                console.error(err);
-            });
+        this.props.sendSignupData(this.props.email, this.props.password);
     }
 
     render() {
@@ -98,4 +73,4 @@ const mapStateToProps = (state) => ({
     user: state.user
 });
 
-export default connect(mapStateToProps, {resetSignupState, setSignupEmail, setSignupErrorMessage, setSignupPassword, setUser})(Signup);
+export default connect(mapStateToProps, {sendSignupData, setSignupEmail, setSignupPassword, updateStoreWithUser})(Signup);
