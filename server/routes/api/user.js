@@ -1,10 +1,12 @@
-const express = require('express');
-const router = express.Router();
+const express = require('express'),
+    router = express.Router();
+const mongoose = require('mongoose');
 const User = require('../../models/user');
 
 router.patch('/:userId', (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
+    const userId = req.params.userId;
 
     const fields = {};
     if (email) {
@@ -14,7 +16,13 @@ router.patch('/:userId', (req, res, next) => {
         fields.password = password
     }
 
-    User.findByIdAndUpdate(req.params.userId, fields, {new: true})
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+        const error = new Error('Invalid User ID.');
+        error.status = 400;
+        return next(error);
+    }
+
+    User.findByIdAndUpdate(userId, fields, {new: true}).select('-password')
         .exec((error, user) => {
             if (error) {
                 return next(error);
@@ -23,7 +31,7 @@ router.patch('/:userId', (req, res, next) => {
                 return res.sendStatus(404);
             }
             // TODO: figure out if we want to send only fields that were updated, back
-            res.send(user);
+            res.send({user});
         });
 });
 
