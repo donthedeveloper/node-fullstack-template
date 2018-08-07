@@ -1,16 +1,10 @@
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Redirect} from 'react-router';
 import {sendSignupData, setSignupEmail, setSignupPassword} from './Signup.actions';
 import {updateStoreWithUser} from '../User.actions';
 
 class Signup extends Component {
-    componentDidMount = () => {
-        if (!this.props.user) {
-            this.props.updateStoreWithUser();
-        }
-    }
 
     handleOnEmailChange = (e) => {
         this.props.setSignupEmail(e.target.value);
@@ -26,10 +20,6 @@ class Signup extends Component {
     }
 
     render() {
-        if (this.props.user) {
-            return <Redirect to='/profile' />
-        }
-
         return (
             <form onSubmit={this.handleSubmit}>
                 <p>{this.props.errorMessage}</p>
@@ -64,6 +54,7 @@ Signup.propTypes = {
         email: PropTypes.string,
         password: PropTypes.string
     })
+    // TODO: check action creators attached to props
 };
 
 const mapStateToProps = (state) => ({

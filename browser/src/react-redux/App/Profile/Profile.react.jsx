@@ -5,15 +5,19 @@ import React, {Component} from 'react';
 import {updateStoreWithUser} from '../User.actions';
 
 class Profile extends Component {
-    componentDidMount = async () => {
-        if (!this.props.user) {
-            // TODO: possibly add option callback parameter to updateStoreWithUser function to redirect on empty user
-            await this.props.updateStoreWithUser();
-            if (!this.props.user) {
-                this.props.history.push('/login');
-            }
-        }
-    }
+    
+    // TODO: create tickets for these things
+    // TODO: create handles for changing inputs
+    // TODO: set up custom frontend validation for confirm password
+    // TODO: set up /user GET route
+    // TODO: set up backend validation error to be stored in frontend
+    // TODO: set up success message
+    // TODO: write tests for /whoami GET route
+    // TODO: write tests for /user GET route
+    // TODO: sketch stream of signup/login/profile pages
+    // TODO: style components!
+    // TODO: create custom validation messages that are friendlier
+    // TODO: update friendlier messages in what we test
 
     handleSubmit = (e) => {
         e.preventDefault();

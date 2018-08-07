@@ -1,16 +1,10 @@
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Redirect} from 'react-router';
 import {authenticate, setLoginEmail, setLoginPassword} from './Login.actions';
 import {updateStoreWithUser} from '../User.actions';
 
 class Login extends Component {
-    componentDidMount = () => {
-        if (!this.props.user) {
-            this.props.updateStoreWithUser();
-        }
-    }
 
     handleSubmit = (e) => {
         e.preventDefault();
@@ -26,10 +20,6 @@ class Login extends Component {
     };
 
     render() {
-        if (this.props.user) {
-            return <Redirect to='/profile' />
-        }
-
         return (
             <form onSubmit={this.handleSubmit}>
                 <p>{this.props.errorMessage}</p>

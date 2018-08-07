@@ -45,6 +45,6 @@ export const authenticate = (email, password) =>
                 dispatch(setLoginErrorMessage(err.response.data.message));
             });
 
-export const updateProfile = ({email, password, confirmPassword}) =>
-    dispatch =>
-        axios.patch()
+// export const updateProfile = ({email, password, confirmPassword}) =>
+//     dispatch =>
+//         axios.patch()
