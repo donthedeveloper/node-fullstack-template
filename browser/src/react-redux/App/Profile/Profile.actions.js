@@ -6,6 +6,7 @@ const SET_PROFILE_CONFIRM_PASSWORD = 'SET_PROFILE_CONFIRM_PASSWORD';
 const SET_PROFILE_EMAIL = 'SET_PROFILE_EMAIL';
 const SET_PROFILE_ERROR_MESSAGE = 'SET_PROFILE_ERROR_MESSAGE';
 const SET_PROFILE_PASSWORD = 'SET_PROFILE_PASSWORD';
+const RESET_PROFILE_ERROR_MESSAGE = 'RESET_PROFILE_ERROR_MESSAGE';
 const RESET_PROFILE_STATE = 'RESET_SIGNUP_STATE';
 
 // action creators
@@ -29,11 +30,16 @@ export const setProfilePassword = (password) => ({
     password
 });
 
+export const resetProfileErrorMessage = () => ({
+    type: RESET_PROFILE_ERROR_MESSAGE
+});
+
 export const resetProfileState = () => ({
     type: RESET_PROFILE_STATE
 });
 
 // thunks
+// TODO: get rid of this? I think it's just a reference
 export const authenticate = (email, password) =>
     dispatch =>
         axios.post('/api/login', {email, password})

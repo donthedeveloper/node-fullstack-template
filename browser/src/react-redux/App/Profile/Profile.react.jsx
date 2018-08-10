@@ -3,12 +3,14 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import React, {Component} from 'react';
 import {updateStoreWithUser} from '../User.actions';
+import {resetProfileErrorMessage, setProfileConfirmPassword, setProfileEmail, setProfileErrorMessage, setProfilePassword} from './Profile.actions';
 
 class Profile extends Component {
     
     // TODO: create tickets for these things
-    // TODO: create handles for changing inputs
-    // TODO: set up custom frontend validation for confirm password
+    // TODO: carry over confirm password to signup page
+    // TODO: set up prop types for action creators attached to props
+    // TODO: set up friendly property names for reducers that we combine
     // TODO: set up /user GET route
     // TODO: set up backend validation error to be stored in frontend
     // TODO: set up success message
@@ -19,8 +21,28 @@ class Profile extends Component {
     // TODO: create custom validation messages that are friendlier
     // TODO: update friendlier messages in what we test
 
+    handleConfirmPasswordChange = (e) => {
+        this.props.setProfileConfirmPassword(e.target.value);
+    }
+
+    handleEmailChange = (e) => {
+        this.props.setProfileEmail(e.target.value);
+    };
+
+    handlePasswordChange = (e) => {
+        this.props.setProfilePassword(e.target.value);
+    };
+
     handleSubmit = (e) => {
         e.preventDefault();
+        const password = this.props.password;
+        const confirmPassword = this.props.confirmPassword;
+        if (password && password !== confirmPassword) {
+            this.props.setProfileErrorMessage('Passwords must match.');
+        } else {
+            this.props.resetProfileErrorMessage();
+        }
+        // this.props.sendProfileData(this.props.email, this.props.password);
     }
 
     render() {
@@ -30,7 +52,7 @@ class Profile extends Component {
                 <label htmlFor='email'>Email:</label>
                 <input
                     id='email'
-                    onChange={this.handleOnEmailChange}
+                    onChange={this.handleEmailChange}
                     required
                     type='email'
                     value={this.props.email}
@@ -38,14 +60,16 @@ class Profile extends Component {
                 <label htmlFor='password'>Password:</label>
                 <input
                     id='password'
-                    onChange={this.handleOnPasswordChange}
+                    onChange={this.handlePasswordChange}
+                    required={Boolean(this.props.confirmPassword)}
                     type='password'
                     value={this.props.password}
                 />
                 <label htmlFor='confirmPassword'>Confirm Password</label>
                 <input
                     id='confirmPassword'
-                    onChange={this.handleOnConfirmPasswordChange}
+                    onChange={this.handleConfirmPasswordChange}
+                    required={Boolean(this.props.password)}
                     type='password'
                     value={this.props.confirmPassword}
                 />
@@ -75,4 +99,4 @@ const mapStateToProps = (state) => ({
     user: state.user
 });
 
-export default connect(mapStateToProps, {updateStoreWithUser})(Profile);
+export default connect(mapStateToProps, {resetProfileErrorMessage, setProfileConfirmPassword, setProfileEmail, setProfileErrorMessage, setProfilePassword, updateStoreWithUser})(Profile);

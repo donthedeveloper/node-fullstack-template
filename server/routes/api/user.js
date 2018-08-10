@@ -31,6 +31,7 @@ router.patch('/:userId', (req, res, next) => {
                 return res.sendStatus(404);
             }
             // TODO: figure out if we want to send only fields that were updated, back
+            // TODO: is 200 the correct status code?
             res.send({user});
         });
 });

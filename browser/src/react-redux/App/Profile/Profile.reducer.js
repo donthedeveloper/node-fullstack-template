@@ -3,6 +3,7 @@ const SET_PROFILE_CONFIRM_PASSWORD = 'SET_PROFILE_CONFIRM_PASSWORD';
 const SET_PROFILE_EMAIL = 'SET_PROFILE_EMAIL';
 const SET_PROFILE_ERROR_MESSAGE = 'SET_PROFILE_ERROR_MESSAGE';
 const SET_PROFILE_PASSWORD = 'SET_PROFILE_PASSWORD';
+const RESET_PROFILE_ERROR_MESSAGE = 'RESET_PROFILE_ERROR_MESSAGE';
 const RESET_PROFILE_STATE = 'RESET_SIGNUP_STATE';
 
 const initialState = {
@@ -16,6 +17,9 @@ export default (state=initialState, action) => {
     const newState = Object.assign({}, state);
 
     switch(action.type) {
+        case RESET_PROFILE_ERROR_MESSAGE:
+            newState.errorMessage = initialState.errorMessage;
+            break;
         case RESET_PROFILE_STATE:
             return initialState;
         case SET_PROFILE_EMAIL:
