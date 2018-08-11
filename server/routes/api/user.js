@@ -22,16 +22,19 @@ router.patch('/:userId', (req, res, next) => {
         return next(error);
     }
 
-    User.findByIdAndUpdate(userId, fields, {new: true}).select('-password')
+    User.findByIdAndUpdate(userId, fields, {
+        new: true,
+        runValidators: true
+    }).select('-password')
         .exec((error, user) => {
             if (error) {
+                // console.log('whats the error:', error);
                 return next(error);
             }
             if (!user) {
                 return res.sendStatus(404);
             }
-            // TODO: figure out if we want to send only fields that were updated, back
-            // TODO: is 200 the correct status code?
+
             res.send({user});
         });
 });

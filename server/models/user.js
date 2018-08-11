@@ -1,12 +1,17 @@
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
+const validate = require('mongoose-validator');
 
 const UserSchema = new mongoose.Schema({
     email: {
         required: true,
         trim: true,
         type: String,
-        unique: true // TODO: set up custom error message, possibly catch the error code in the route and build a custom message
+        unique: true, // TODO: set up custom error message, possibly catch the error code in the route and build a custom message
+        validate: validate({
+            validator: 'isEmail',
+            message: 'Provide a proper email address.'
+        })
     },
     password: {
         required: true,

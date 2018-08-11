@@ -8,8 +8,6 @@ router.get('/', (req, res, next) => {
     if (!userId) {
         return res.send({user: null});
     }
-    console.log('session:', req.session);
-    console.log('userId:', userId);
 
     return User.findById(userId).select('-password')
         .exec((error, user) => {

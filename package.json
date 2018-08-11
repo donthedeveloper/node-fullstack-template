@@ -12,6 +12,7 @@
     "express": "^4.16.2",
     "express-session": "^1.15.6",
     "mongoose": "^5.2.4",
+    "mongoose-validator": "^2.1.0",
     "morgan": "^1.9.0",
     "nunjucks": "^3.0.1",
     "nunjucks-autoescape": "^1.0.1",

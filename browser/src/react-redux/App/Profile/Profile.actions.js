@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {updateStoreWithUser} from '../User.actions';
+import {setUser, updateStoreWithUser} from '../User.actions';
 
 // TODO: share constants file with reducer
 const SET_PROFILE_CONFIRM_PASSWORD = 'SET_PROFILE_CONFIRM_PASSWORD';
@@ -51,6 +51,15 @@ export const authenticate = (email, password) =>
                 dispatch(setLoginErrorMessage(err.response.data.message));
             });
 
-// export const updateProfile = ({email, password, confirmPassword}) =>
-//     dispatch =>
-//         axios.patch()
+export const updateProfile = (userId, email, password) =>
+    dispatch =>
+        axios.patch(`/api/user/${userId}`, {email, password})
+            .then((response) => {
+                dispatch(setUser(response.data.user));
+            })
+            .catch((err) => {
+                console.log(err.response.errors);
+                if (err.response.status === 404) {
+                    dispatch(setProfileErrorMessage(`You don't exist.`))
+                }
+            });
