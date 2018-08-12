@@ -34,10 +34,24 @@ describe('\'/api/login\' Route', () => {
                         done();
                     });
             });
-        })
+        });
+
+        describe('made with a valid email and password', function() {
+            const status = 200;
+            it(`responds with status ${status}`, function(done) {
+                chai.request(app)
+                    .post('/api/login')
+                    .type('form')
+                    .send({email, password})
+                    .end((err, res) => {
+                        expect(res).to.have.status(200);
+                        done();
+                    });
+            });
+        });
 
         afterEach(function() {
-            return User.deleteOne({email});
+            return User.remove({email});
         });
     });
 });

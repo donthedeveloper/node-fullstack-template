@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {setUser, updateStoreWithUser} from '../User.actions';
+import {setUser} from '../User.actions';
 
 // TODO: share constants file with reducer
 const SET_PROFILE_CONFIRM_PASSWORD = 'SET_PROFILE_CONFIRM_PASSWORD';
@@ -39,18 +39,6 @@ export const resetProfileState = () => ({
 });
 
 // thunks
-// TODO: get rid of this? I think it's just a reference
-export const authenticate = (email, password) =>
-    dispatch =>
-        axios.post('/api/login', {email, password})
-            .then(() => {
-                dispatch(updateStoreWithUser());
-                dispatch(resetLoginState());
-            })
-            .catch((err) => {
-                dispatch(setLoginErrorMessage(err.response.data.message));
-            });
-
 export const updateProfile = (userId, email, password) =>
     dispatch =>
         axios.patch(`/api/user/${userId}`, {email, password})
@@ -59,13 +47,18 @@ export const updateProfile = (userId, email, password) =>
                 dispatch(resetProfileErrorMessage());
             })
             .catch((err) => {
-                console.log(err.response.errors);
                 if (err.response.status === 404) {
                     dispatch(setProfileErrorMessage(`You don't exist.`));
                 }
 
                 if (err.response.status === 400) {
-                    console.log(err.response);
-                    dispatch(setProfileErrorMessage(err.response.data.errors.email.message));
+                    let errorMessage;
+                    const errorData = err.response.data.error;
+                    if (err.response.data.error.errors) {
+                        errorMessage = errorData.errors.email.message;
+                    } else {
+                        errorMessage = errorData.message;
+                    }
+                    dispatch(setProfileErrorMessage(errorMessage));
                 }
             });

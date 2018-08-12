@@ -5,41 +5,50 @@ const uniqueValidator = require('mongoose-unique-validator');
 
 const UserSchema = new mongoose.Schema({
     email: {
-        required: true,
+        required: [
+            true,
+            'You must provide an email address.'
+        ],
         trim: true,
         type: String,
-        unique: true, // TODO: set up custom error message, possibly catch the error code in the route and build a custom message
+        unique: true,
         validate: validate({
             validator: 'isEmail',
             message: 'Provide a proper email address.'
         })
     },
     password: {
-        required: true,
+        required: [
+            true,
+            'You must provide a password.'
+        ],
         type: String
     }
 });
 
-UserSchema.plugin(uniqueValidator);
+UserSchema.plugin(uniqueValidator, {
+    message: 'This email address is already taken.'
+});
 
 UserSchema.statics.authenticate = function(email, password, callback) {
     User.findOne({email})
         .exec(function (error, user) {
-            if (error) {
-                return callback(error);
-            }
-
-            if (user) {
-                bcrypt.compare(password, user.password, function(error, result) {
-                    if (result === true) {
-                        return callback(null, user);
-                    }
-                });
-            }
-
-            return callback({
+            const errorObj = {
                 message: 'Incorrect username and password combination.',
                 name: 'AuthenticationError'
+            };
+
+            if (error || !user) {
+                return callback(errorObj); // TODO: this isnt actually an auth error, this is a mongo or schema error
+            }
+
+
+            bcrypt.compare(password, user.password, function(error, result) {
+                if (result === true) {
+                    return callback(null, user);
+                } else {
+                    return callback(errorObj);
+                }
             });
         });
 }

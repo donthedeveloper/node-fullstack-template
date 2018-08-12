@@ -26,9 +26,9 @@ router.use((req, res, next) => {
   next(err);
 });
 
-router.use((error, req, res, next) => {
+router.use((err, req, res, next) => {
   res.status(err.status || 500);
-  res.json({error});
+  res.json({error: err});
 });
 
 module.exports = router;

@@ -8,53 +8,58 @@ const User = require('../server/models/user');
 // TODO: re-run tests whenever a code change happens in the app
 
 describe('\'/api/user\' Route', function() {
+    const emailDuplicateErrorMessage = 'This email address is already taken.';
+    const validationErrorName = 'ValidationError';
     describe('POST Request', function() {
         const email = 'thisisnotarealemail@gmail.com';
         const password = 'password';
+        const emailEmptyErrorMessage = 'You must provide an email address.';
+        const passwordEmptyErrorMessage = 'You must provide a password.';
 
         describe('made with an empty payload', function() {
-            const errorMessage = 'All fields required.';
             const status = 400;
-            it(`responds with status ${status} and includes message '${errorMessage}'`, function(done) {
+            it(`responds with status ${status} and includes error messages '${emailEmptyErrorMessage}' & '${passwordEmptyErrorMessage}'`, function(done) {
                 chai.request(app)
                     .post('/api/user')
                     .type('form')
                     .send({})
                     .end(function(err, res) {
                         expect(res).to.have.status(status);
-                        expect(res.body).to.have.property('message').eql(errorMessage);
+                        expect(res.body.error.name).to.equal(validationErrorName);
+                        expect(res.body.error.errors.email.message).to.equal(emailEmptyErrorMessage);
+                        expect(res.body.error.errors.password.message).to.equal(passwordEmptyErrorMessage);
                         done();
                     });
             });
         });
 
         describe('made without an email address', function() {
-            const errorMessage = 'All fields required.';
             const status = 400;
-            it(`responds with status ${status} and includes message '${errorMessage}'`, function(done) {
+            it(`responds with status ${status} and includes message '${emailEmptyErrorMessage}'`, function(done) {
                 chai.request(app)
                     .post('/api/user')
                     .type('form')
                     .send({password})
                     .end(function(err, res) {
                         expect(res).to.have.status(status);
-                        expect(res.body).to.have.property('message').eql(errorMessage);
+                        expect(res.body.error.name).to.equal(validationErrorName);
+                        expect(res.body.error.errors.email.message).to.equal(emailEmptyErrorMessage);
                         done();
                     });
             });
         });
 
         describe('made without a password', function() {
-            const errorMessage = 'All fields required.';
             const status = 400;
-            it(`responds with status ${status} and includes message '${errorMessage}'`, function(done) {
+            it(`responds with status ${status} and includes message '${passwordEmptyErrorMessage}'`, function(done) {
                 chai.request(app)
                     .post('/api/user')
                     .type('form')
                     .send({email})
                     .end(function(err, res) {
                         expect(res).to.have.status(status);
-                        expect(res.body).to.have.property('message').eql(errorMessage);
+                        expect(res.body.error.name).to.equal(validationErrorName);
+                        expect(res.body.error.errors.password.message).to.equal(passwordEmptyErrorMessage);
                         done();
                     });
             });
@@ -76,7 +81,7 @@ describe('\'/api/user\' Route', function() {
 
         describe('made with duplicate (unique) email', function() {
             const status = 400;
-            it(`responds with a status of ${status}`, async function() {
+            it(`responds with a status of ${status} and includes message '${emailDuplicateErrorMessage}'`, async function() {
                 await User.create({email, password});
 
                 return chai.request(app)
@@ -88,12 +93,14 @@ describe('\'/api/user\' Route', function() {
                         })
                         .catch((error) => {
                             expect(error).to.have.status(status);
+                            expect(error.response.body.error.name).to.equal(validationErrorName);
+                            expect(error.response.body.error.errors.email.message).to.equal(emailDuplicateErrorMessage);
                         });
             });
         });
 
         afterEach(function() {
-            return User.deleteOne({email});
+            return User.remove({email});
         });
     });
 
@@ -126,7 +133,8 @@ describe('\'/api/user\' Route', function() {
                     .send({})
                     .end(function(err, res) {
                         expect(res).to.have.status(status);
-                        expect(res.body).to.have.property('message').eql(errorMessage);
+                        expect(res.body.error).to.have.property('name').eql(validationErrorName);
+                        expect(res.body.error).to.have.property('message').eql(errorMessage);
                         done();
                     });
             });
@@ -169,7 +177,7 @@ describe('\'/api/user\' Route', function() {
             });
         });
 
-        // TODO: get async await to work in tests
+        // // TODO: get async await to work in tests
         // describe('made with an empty payload', function() {
         //     const status = 200;
         //     it(`responds with status ${status} and includes user.email with value of ${user1.email}`, async function() {
@@ -209,14 +217,13 @@ describe('\'/api/user\' Route', function() {
                     })
                     .catch((err) => {
                         console.error(err);
-                    })
+                    });
             });
         });
 
         describe('made with a duplicate (unique) email address to update', function() {
-            const errorMessage = '';
             const status = 400;
-            it(`responds with status ${status} and includes message '${errorMessage}'`, function(done) {
+            it(`responds with status ${status} and includes message '${emailDuplicateErrorMessage}'`, function(done) {
                 User.findOne({email: user1.email})
                     .then((user) => {
                         chai.request(app)
@@ -225,9 +232,8 @@ describe('\'/api/user\' Route', function() {
                         .send({email: user2.email})
                         .end(function(err, res) {
                             expect(res).to.have.status(status);
-                            expect(res.body).to.have.property('message');
-                            expect(res.body.message).to.be.an('string');
-                            // TODO: create and test for a custom validation message (which isnt set up yet in model)
+                            expect(err.response.body.error.name).to.equal(validationErrorName);
+                            expect(err.response.body.error.errors.email.message).to.equal(emailDuplicateErrorMessage);
                             done();
                         });
                     })
