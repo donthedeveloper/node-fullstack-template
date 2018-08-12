@@ -47,15 +47,15 @@ class Profile extends Component {
                 <input
                     id='email'
                     onChange={this.handleEmailChange}
-                    // required
-                    // type='email'
+                    required
+                    type='email'
                     value={this.props.email}
                 />
                 <label htmlFor='password'>Password:</label>
                 <input
                     id='password'
                     onChange={this.handlePasswordChange}
-                    // required={Boolean(this.props.confirmPassword)}
+                    required={Boolean(this.props.confirmPassword)}
                     type='password'
                     value={this.props.password}
                 />
@@ -63,7 +63,7 @@ class Profile extends Component {
                 <input
                     id='confirmPassword'
                     onChange={this.handleConfirmPasswordChange}
-                    // required={Boolean(this.props.password)}
+                    required={Boolean(this.props.password)}
                     type='password'
                     value={this.props.confirmPassword}
                 />

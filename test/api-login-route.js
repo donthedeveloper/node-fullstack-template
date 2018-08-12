@@ -10,23 +10,27 @@ const User = require('../server/models/user');
 describe('\'/api/login\' Route', () => {
     describe('POST Request', () => {
         const email = 'thisisnotarealemail@gmail.com';
-        const password = 'thisisnotarealemail@gmail.com';
+        const password = 'rightpassword';
+        const wrongPassword = 'wrongpassword';
 
         beforeEach(function() {
             return User.create({email, password});
         });
 
-        describe('made with an empty payload', function() {
-            const errorMessage = 'All fields required.';
+        describe('made with an invalid email and password', function() {
+            const errorMessage = 'Incorrect username and password combination.';
             const status = 400;
             it(`responds with status ${status} and includes message '${errorMessage}'`, function(done) {
                 chai.request(app)
                     .post('/api/login')
                     .type('form')
-                    .send({})
+                    .send({
+                        email,
+                        password: wrongPassword
+                    })
                     .end((err, res) => {
                         expect(res).to.have.status(status);
-                        expect(res.body).to.have.property('message').eql(errorMessage);
+                        expect(res.body.error.message).to.equal(errorMessage);
                         done();
                     });
             });

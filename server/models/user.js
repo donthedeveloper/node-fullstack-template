@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const validate = require('mongoose-validator');
+const uniqueValidator = require('mongoose-unique-validator');
 
 const UserSchema = new mongoose.Schema({
     email: {
@@ -19,23 +20,26 @@ const UserSchema = new mongoose.Schema({
     }
 });
 
+UserSchema.plugin(uniqueValidator);
+
 UserSchema.statics.authenticate = function(email, password, callback) {
     User.findOne({email})
         .exec(function (error, user) {
             if (error) {
                 return callback(error);
-            } else if (!user) {
-                const err = new Error('User not found.');
-                err.status = 401;
-                return callback(err);
             }
 
-            bcrypt.compare(password, user.password, function(error, result) {
-                if (result === true) {
-                    return callback(null, user);
-                } else {
-                    return callback();
-                }
+            if (user) {
+                bcrypt.compare(password, user.password, function(error, result) {
+                    if (result === true) {
+                        return callback(null, user);
+                    }
+                });
+            }
+
+            return callback({
+                message: 'Incorrect username and password combination.',
+                name: 'AuthenticationError'
             });
         });
 }

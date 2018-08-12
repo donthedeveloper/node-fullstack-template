@@ -28,7 +28,6 @@ router.patch('/:userId', (req, res, next) => {
     }).select('-password')
         .exec((error, user) => {
             if (error) {
-                // console.log('whats the error:', error);
                 return next(error);
             }
             if (!user) {

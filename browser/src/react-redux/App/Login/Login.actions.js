@@ -36,5 +36,6 @@ export const authenticate = (email, password) =>
                 dispatch(resetLoginState());
             })
             .catch((err) => {
-                dispatch(setLoginErrorMessage(err.response.data.message));
+                console.log('err response:', err.response);
+                dispatch(setLoginErrorMessage(err.response.data.error.message));
             });

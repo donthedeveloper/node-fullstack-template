@@ -11,22 +11,14 @@ router.use('/login', loginApi);
 router.use('/logout', logoutApi);
 router.use('/whoami', whoamiApi);
 
-// API Catchall Error Handler
-// TODO: send proper error code and get correct error messaging from error object
+// API Catchall Error Handlers
+
 router.use((err, req, res, next) => {
-  console.log('errors:', err.errors);
-  if (err.name === 'ValidationError') {
+  if (err.name === 'ValidationError' || err.name === 'AuthenticationError') {
     err.status = 400;
   }
   next(err);
-})
-
-// router.use((err, req, res, next) => {
-//   if (err.code === 11000) {
-//     err.status = 400;
-//   }
-//   next(err);
-// });
+});
 
 router.use((req, res, next) => {
   const err = new Error('Route not found.');
@@ -34,11 +26,9 @@ router.use((req, res, next) => {
   next(err);
 });
 
-router.use((err, req, res, next) => {
+router.use((error, req, res, next) => {
   res.status(err.status || 500);
-  res.json({
-    message: err.message
-  })
+  res.json({error});
 });
 
 module.exports = router;

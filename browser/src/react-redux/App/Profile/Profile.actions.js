@@ -56,10 +56,16 @@ export const updateProfile = (userId, email, password) =>
         axios.patch(`/api/user/${userId}`, {email, password})
             .then((response) => {
                 dispatch(setUser(response.data.user));
+                dispatch(resetProfileErrorMessage());
             })
             .catch((err) => {
                 console.log(err.response.errors);
                 if (err.response.status === 404) {
-                    dispatch(setProfileErrorMessage(`You don't exist.`))
+                    dispatch(setProfileErrorMessage(`You don't exist.`));
+                }
+
+                if (err.response.status === 400) {
+                    console.log(err.response);
+                    dispatch(setProfileErrorMessage(err.response.data.errors.email.message));
                 }
             });
