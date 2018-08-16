@@ -14,7 +14,7 @@ router.get('/', (req, res, next) => {
             if (error) {
                 return next(error);
             }
-            return user ? res.send({user: user}) : res.send({user: null});
+            return user ? res.json({user}) : res.json({user: null});
         });
 });
 

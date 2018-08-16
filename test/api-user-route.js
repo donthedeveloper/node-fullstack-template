@@ -227,15 +227,15 @@ describe('\'/api/user\' Route', function() {
                 User.findOne({email: user1.email})
                     .then((user) => {
                         chai.request(app)
-                        .patch(`/api/user/${user._id}`)
-                        .type('form')
-                        .send({email: user2.email})
-                        .end(function(err, res) {
-                            expect(res).to.have.status(status);
-                            expect(err.response.body.error.name).to.equal(validationErrorName);
-                            expect(err.response.body.error.errors.email.message).to.equal(emailDuplicateErrorMessage);
-                            done();
-                        });
+                            .patch(`/api/user/${user._id}`)
+                            .type('form')
+                            .send({email: user2.email})
+                            .end(function(err, res) {
+                                expect(res).to.have.status(status);
+                                expect(err.response.body.error.name).to.equal(validationErrorName);
+                                expect(err.response.body.error.errors.email.message).to.equal(emailDuplicateErrorMessage);
+                                done();
+                            });
                     })
                     .catch((err) => {
                         console.error(err);
@@ -251,6 +251,4 @@ describe('\'/api/user\' Route', function() {
             ]);
         });
     });
-
-
 });
