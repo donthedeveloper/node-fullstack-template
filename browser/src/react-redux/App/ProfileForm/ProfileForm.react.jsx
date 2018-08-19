@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import React, {Component} from 'react';
-import {resetProfileState, setProfileConfirmPassword, setProfileEmail, setProfileErrorMessage, setProfilePassword, updateProfile} from './ProfileForm.actions';
+import {resetProfileState, setProfileConfirmPassword, setProfileEmail, setProfileError, setProfilePassword, updateProfile} from './ProfileForm.actions';
 
 class ProfileForm extends Component {
 
@@ -38,7 +38,11 @@ class ProfileForm extends Component {
     render() {
         return (
             <form onSubmit={this.handleSubmit}>
-                <p>{this.props.errorMessage}</p>
+                <ul>
+                    {this.props.error.messages.map((message, i) =>
+                        <li key={i}>{message}</li>
+                    )}
+                </ul>
                 <label htmlFor='email'>Email:</label>
                 <input
                     id='email'
@@ -72,7 +76,10 @@ class ProfileForm extends Component {
 ProfileForm.propTypes = {
     // profile state
     email: PropTypes.string,
-    errorMessage: PropTypes.string,
+    error: PropTypes.shape({
+        fields: PropTypes.array.isRequired,
+        messages: PropTypes.array.isRequired
+    }).isRequired,
     password: PropTypes.string,
     confirmPassword: PropTypes.string,
     // user state
@@ -84,7 +91,7 @@ ProfileForm.propTypes = {
     resetProfileState: PropTypes.func.isRequired,
     setProfileConfirmPassword: PropTypes.func.isRequired,
     setProfileEmail: PropTypes.func.isRequired,
-    setProfileErrorMessage: PropTypes.func.isRequired,
+    setProfileError: PropTypes.func.isRequired,
     setProfilePassword: PropTypes.func.isRequired,
     updateProfile: PropTypes.func.isRequired
 };
@@ -92,7 +99,7 @@ ProfileForm.propTypes = {
 const mapStateToProps = (state) => ({
     // profile state
     email: state.profileForm.email,
-    errorMessage: state.profileForm.errorMessage,
+    error: state.profileForm.error,
     password: state.profileForm.password,
     confirmPassword: state.profileForm.confirmPassword,
     // user state
@@ -101,5 +108,5 @@ const mapStateToProps = (state) => ({
 
 export default connect(
     mapStateToProps,
-    {resetProfileState, setProfileConfirmPassword, setProfileEmail, setProfileErrorMessage, setProfilePassword, updateProfile}
+    {resetProfileState, setProfileConfirmPassword, setProfileEmail, setProfileError, setProfilePassword, updateProfile}
 )(ProfileForm);

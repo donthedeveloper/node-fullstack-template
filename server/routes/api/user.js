@@ -8,7 +8,7 @@ router.patch('/:userId', (req, res, next) => {
     const userId = req.params.userId;
 
     const fields = {};
-    if (email) {
+    if (req.body.hasOwnProperty('email')) {
         fields.email = email;
     }
     if (password) {
@@ -33,10 +33,15 @@ router.patch('/:userId', (req, res, next) => {
                 return next(error);
             }
             if (!user) {
-                return res.sendStatus(404);
+                res.status(404);
+                return res.json({
+                    error: {
+                        message: `User doesn't exist.`
+                    }
+                });
             }
 
-            res.send({user});
+            res.json({user});
         });
 });
 

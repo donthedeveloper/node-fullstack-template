@@ -9,11 +9,11 @@ const User = require('../server/models/user');
 
 describe('\'/api/user\' Route', function() {
     const emailDuplicateErrorMessage = 'This email address is already taken.';
+    const emailEmptyErrorMessage = 'You must provide an email address.';
     const validationErrorName = 'ValidationError';
     describe('POST Request', function() {
         const email = 'thisisnotarealemail@gmail.com';
         const password = 'password';
-        const emailEmptyErrorMessage = 'You must provide an email address.';
         const passwordEmptyErrorMessage = 'You must provide a password.';
 
         describe('made with an empty payload', function() {
@@ -120,7 +120,7 @@ describe('\'/api/user\' Route', function() {
         });
 
         // test for user not found (404)
-        describe('made with an non-existing, invalid user id', function() {
+        describe('made with an invalid user id', function() {
             const errorMessage = 'Invalid User ID.';
             const status = 400;
             it(`responds with status ${status} and includes message '${errorMessage}'`, function(done) {
@@ -136,6 +136,34 @@ describe('\'/api/user\' Route', function() {
                     });
             });
         });
+
+        describe('made with a non-existing user id', function() {
+            const errorMessage = `User doesn't exist.`;
+            const status = 404;
+            it(`responds with status ${status} and includes message '${errorMessage}'`, function(done) {
+                User.findOne({email: user1.email})
+                    .then((user) => {
+                        User.remove({email: user1.email})
+                            .then(() => {
+                                chai.request(app)
+                                    .patch(`/api/user/${user._id}`)
+                                    .type('form')
+                                    .send({})
+                                    .end(function(err, res) {
+                                        expect(res).to.have.status(status);
+                                        expect(res.body.error.message).to.equal(errorMessage);
+                                        done();
+                                    });
+                            })
+                            .catch((err) => {
+                                done(err);
+                            });
+                    })
+                    .catch((err) => {
+                        done(err);
+                    });
+            });
+        })
 
         describe('made with an non-existing, valid user id', function() {
             const status = 404;
@@ -155,24 +183,48 @@ describe('\'/api/user\' Route', function() {
             const status = 200;
             it(`responds with status ${status} and includes user.email with value of ${user1.email}`, function(done) {
                 User.findOne({email: user1.email})
-                .then((user) => {
-                    chai.request(app)
-                    .patch(`/api/user/${user._id}`)
-                    .type('form')
-                    .send({})
-                    .end(function(err, res) {
-                        expect(res).to.have.status(status);
-                        expect(res.body).to.have.property('user');
-                        expect(res.body.user).to.be.an('object');
-                        expect(res.body.user.email).to.equal(user1.email);
-                        done();
+                    .then((user) => {
+                        chai.request(app)
+                        .patch(`/api/user/${user._id}`)
+                        .type('form')
+                        .send({})
+                        .end(function(err, res) {
+                            expect(res).to.have.status(status);
+                            expect(res.body).to.have.property('user');
+                            expect(res.body.user).to.be.an('object');
+                            expect(res.body.user.email).to.equal(user1.email);
+                            done();
+                        });
+                    })
+                    .catch((err) => {
+                        done(err);
                     });
-                })
-                .catch((err) => {
-                    done(err);
-                });
             });
         });
+
+        describe('made with an empty email address', function() {
+            const status = 400;
+            it(`responds with status ${status} and includes message ${emailEmptyErrorMessage}`, function(done) {
+                User.findOne({email: user1.email})
+                    .then((user) => {
+                        chai.request(app)
+                        .patch(`/api/user/${user._id}`)
+                        .type('form')
+                        .send({
+                            email: ''
+                        })
+                        .end(function(err, res) {
+                            expect(res).to.have.status(status);
+                            expect(res.body.error).to.have.property('name').eql(validationErrorName);
+                            expect(res.body.error.errors.email.message).to.equal(emailEmptyErrorMessage);
+                            done();
+                        });
+                    })
+                    .catch((err) => {
+                        done(err);
+                    });
+            });
+        })
 
         // // TODO: get async await to work in tests
         // describe('made with an empty payload', function() {

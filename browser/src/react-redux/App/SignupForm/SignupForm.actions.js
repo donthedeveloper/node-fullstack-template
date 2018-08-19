@@ -4,7 +4,7 @@ import {updateStoreWithUser} from '../User.actions';
 // TODO: share constants file with reducer
 const SET_SIGNUP_CONFIRM_PASSWORD = 'SET_SIGNUP_CONFIRM_PASSWORD';
 const SET_SIGNUP_EMAIL = 'SET_SIGNUP_EMAIL';
-const SET_SIGNUP_ERROR_MESSAGE = 'SET_SIGNUP_ERROR_MESSAGE';
+const SET_SIGNUP_ERROR = 'SET_SIGNUP_ERROR';
 const SET_SIGNUP_PASSWORD = 'SET_SIGNUP_PASSWORD';
 const RESET_SIGNUP_STATE = 'RESET_SIGNUP_STATE';
 
@@ -20,8 +20,8 @@ export const setSignupEmail = (email) => ({
 });
 
 // TODO: is this still needed?
-export const setSignupErrorMessage = (error) => ({
-    type: SET_SIGNUP_ERROR_MESSAGE,
+export const setSignupError = (error) => ({
+    type: SET_SIGNUP_ERROR,
     error
 });
 
@@ -43,19 +43,7 @@ export const sendSignupData = (email, password) =>
                 dispatch(resetSignupState());
             })
             .catch((err) => {
-                console.log('message:', err.response.data.message);
-                dispatch(setSignupErrorMessage(errorData.errors.email.message));
-
                 if (err.response.status === 400) {
-                    let errorMessage;
-
-                    const errorData = err.response.data.error;
-                    // TODO: we should be checking for password field as well @node-fullstack-template/issues/24
-                    if (err.response.data.error.errors) {
-                        errorMessage = errorData.errors.email.message;
-                    } else {
-                        errorMessage = errorData.message;
-                    }
-                    dispatch(setProfileErrorMessage(errorMessage));
+                    dispatch(setSignupError(err.response.data.error));
                 }
             });

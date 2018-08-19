@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {resetSignupState, sendSignupData, setSignupConfirmPassword, setSignupEmail, setSignupErrorMessage, setSignupPassword} from './SignupForm.actions';
+import {resetSignupState, sendSignupData, setSignupConfirmPassword, setSignupEmail, setSignupError, setSignupPassword} from './SignupForm.actions';
 
 class SignupForm extends Component {
 
@@ -26,7 +26,10 @@ class SignupForm extends Component {
 
         const password = this.props.password;
         if (password && password !== this.props.confirmPassword) {
-            this.props.setSignupErrorMessage('Passwords must match.');
+            // TODO: make this utility function for creating errors
+            this.props.setSignupError({
+                message: 'Passwords must match.'
+            });
             return;
         }
 
@@ -36,7 +39,11 @@ class SignupForm extends Component {
     render() {
         return (
             <form onSubmit={this.handleSubmit}>
-                <p>{this.props.errorMessage}</p>
+                <ul>
+                    {this.props.error.messages.map((message, i) =>
+                        <li key={i}>{message}</li>
+                    )}
+                </ul>
                 <label htmlFor='email'>Email:</label>
                 <input
                     id='email'
@@ -71,7 +78,10 @@ SignupForm.propTypes = {
     // signup state
     confirmPassword: PropTypes.string,
     email: PropTypes.string,
-    errorMessage: PropTypes.string,
+    error: PropTypes.shape({
+        fields: PropTypes.array.isRequired,
+        messages: PropTypes.array.isRequired 
+      }).isRequired,
     password: PropTypes.string,
     // user state
     user: PropTypes.shape({
@@ -83,7 +93,7 @@ SignupForm.propTypes = {
     sendSignupData: PropTypes.func.isRequired,
     setSignupConfirmPassword: PropTypes.func.isRequired,
     setSignupEmail: PropTypes.func.isRequired,
-    setSignupErrorMessage: PropTypes.func.isRequired,
+    setSignupError: PropTypes.func.isRequired,
     setSignupPassword: PropTypes.func.isRequired,
 };
 
@@ -91,7 +101,7 @@ const mapStateToProps = (state) => ({
     // signup state
     confirmPassword: state.signupForm.confirmPassword,
     email: state.signupForm.email,
-    errorMessage: state.signupForm.errorMessage,
+    error: state.signupForm.error,
     password: state.signupForm.password,
     // user state
     user: state.user
@@ -99,5 +109,5 @@ const mapStateToProps = (state) => ({
 
 export default connect(
     mapStateToProps,
-    {resetSignupState, sendSignupData, setSignupConfirmPassword, setSignupEmail, setSignupErrorMessage, setSignupPassword}
+    {resetSignupState, sendSignupData, setSignupConfirmPassword, setSignupEmail, setSignupError, setSignupPassword}
 )(SignupForm);

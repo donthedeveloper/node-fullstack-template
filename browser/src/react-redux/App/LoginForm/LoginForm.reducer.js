@@ -1,13 +1,16 @@
 // TODO: share constants file with actions
 const SET_LOGIN_EMAIL = 'SET_LOGIN_EMAIL';
-const SET_LOGIN_ERROR_MESSAGE = 'SET_LOGIN_ERROR_MESSAGE';
+const SET_LOGIN_ERROR = 'SET_LOGIN_ERROR';
 const SET_LOGIN_PASSWORD = 'SET_LOGIN_PASSWORD';
 const RESET_LOGIN_STATE = 'RESET_SIGNUP_STATE';
 
 const initialState = {
     email: '',
     password: '',
-    errorMessage: ''
+    error: {
+        fields: [],
+        messages: []
+    }
 };
 
 export default (state=initialState, action) => {
@@ -19,8 +22,23 @@ export default (state=initialState, action) => {
         case SET_LOGIN_EMAIL:
             newState.email = action.email;
             break;
-        case SET_LOGIN_ERROR_MESSAGE:
-            newState.errorMessage = action.error;
+        case SET_LOGIN_ERROR:
+            const actionErrors = action.error.errors;
+            const actionMessage = action.error.message;
+            newState.error = Object.assign({}, initialState.error);
+
+            const newFields = [];
+            const newMessages = [];
+            if (actionErrors) {
+                for (let key in actionErrors) {
+                    newFields.push(actionErrors[key].name);
+                    newMessages.push(actionErrors[key].message);
+                }
+                newState.error.fields = [...newFields];
+                newState.error.messages = [...newMessages];
+            } else {
+                newState.error.messages = [actionMessage];
+            }
             break;
         case SET_LOGIN_PASSWORD:
             newState.password = action.password;

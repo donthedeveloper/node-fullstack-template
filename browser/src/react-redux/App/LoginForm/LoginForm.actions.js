@@ -3,7 +3,7 @@ import {updateStoreWithUser} from '../User.actions';
 
 // TODO: share constants file with reducer
 const SET_LOGIN_EMAIL = 'SET_LOGIN_EMAIL';
-const SET_LOGIN_ERROR_MESSAGE = 'SET_LOGIN_ERROR_MESSAGE';
+const SET_LOGIN_ERROR = 'SET_LOGIN_ERROR';
 const SET_LOGIN_PASSWORD = 'SET_LOGIN_PASSWORD';
 const RESET_LOGIN_STATE = 'RESET_SIGNUP_STATE';
 
@@ -13,8 +13,8 @@ export const setLoginEmail = (email) => ({
     email
 });
 
-export const setLoginErrorMessage = (error) => ({
-    type: SET_LOGIN_ERROR_MESSAGE,
+export const setLoginError = (error) => ({
+    type: SET_LOGIN_ERROR,
     error
 });
 
@@ -36,7 +36,7 @@ export const authenticate = (email, password) =>
                 dispatch(resetLoginState());
             })
             .catch((err) => {
-                // TODO: @node-fullstack-template/issues/24
-                console.log('err response:', err.response);
-                dispatch(setLoginErrorMessage(err.response.data.error.message));
+                if (err.response.status === 400) {
+                    dispatch(setLoginError(err.response.data.error));
+                }
             });

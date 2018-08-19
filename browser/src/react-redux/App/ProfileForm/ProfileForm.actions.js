@@ -4,9 +4,9 @@ import {setUser} from '../User.actions';
 // TODO: share constants file with reducer
 const SET_PROFILE_CONFIRM_PASSWORD = 'SET_PROFILE_CONFIRM_PASSWORD';
 const SET_PROFILE_EMAIL = 'SET_PROFILE_EMAIL';
-const SET_PROFILE_ERROR_MESSAGE = 'SET_PROFILE_ERROR_MESSAGE';
+const SET_PROFILE_ERROR = 'SET_PROFILE_ERROR';
 const SET_PROFILE_PASSWORD = 'SET_PROFILE_PASSWORD';
-const RESET_PROFILE_ERROR_MESSAGE = 'RESET_PROFILE_ERROR_MESSAGE';
+const RESET_PROFILE_ERROR = 'RESET_PROFILE_ERROR';
 const RESET_PROFILE_STATE = 'RESET_SIGNUP_STATE';
 
 // action creators
@@ -20,8 +20,8 @@ export const setProfileEmail = (email) => ({
     email
 });
 
-export const setProfileErrorMessage = (error) => ({
-    type: SET_PROFILE_ERROR_MESSAGE,
+export const setProfileError = (error) => ({
+    type: SET_PROFILE_ERROR,
     error
 });
 
@@ -30,8 +30,8 @@ export const setProfilePassword = (password) => ({
     password
 });
 
-export const resetProfileErrorMessage = () => ({
-    type: RESET_PROFILE_ERROR_MESSAGE
+export const resetProfileError = () => ({
+    type: RESET_PROFILE_ERROR
 });
 
 export const resetProfileState = () => ({
@@ -44,22 +44,16 @@ export const updateProfile = (userId, email, password) =>
         axios.patch(`/api/user/${userId}`, {email, password})
             .then((response) => {
                 dispatch(setUser(response.data.user));
-                dispatch(resetProfileErrorMessage());
+                dispatch(resetProfileError());
             })
             .catch((err) => {
+                // TODO: 
                 if (err.response.status === 404) {
-                    dispatch(setProfileErrorMessage(`You don't exist.`));
+                    // dispatch(setProfileErrorMessage(`You don't exist.`));
+                    // TODO: get user new state (by logging them out and redirecting to login page)
                 }
 
-                // TODO: @node-fullstack-template/issues/24
                 if (err.response.status === 400) {
-                    let errorMessage;
-                    const errorData = err.response.data.error;
-                    if (err.response.data.error.errors) {
-                        errorMessage = errorData.errors.email.message;
-                    } else {
-                        errorMessage = errorData.message;
-                    }
-                    dispatch(setProfileErrorMessage(errorMessage));
+                    dispatch(setProfileError(err.response.data.error));
                 }
             });

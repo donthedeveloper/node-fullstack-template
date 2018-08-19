@@ -25,7 +25,11 @@ class LoginForm extends Component {
     render() {
         return (
             <form onSubmit={this.handleSubmit}>
-                <p>{this.props.errorMessage}</p>
+                <ul>
+                    {this.props.error.messages.map((message, i) =>
+                        <li key={i}>{message}</li>
+                    )}
+                </ul>
                 <label htmlFor='email'>Email:</label>
                 <input
                     id='email'
@@ -51,7 +55,10 @@ class LoginForm extends Component {
 LoginForm.propTypes = {
     // login state
     email: PropTypes.string,
-    errorMessage: PropTypes.string,
+    error: PropTypes.shape({
+      fields: PropTypes.array.isRequired,
+      messages: PropTypes.array.isRequired 
+    }).isRequired,
     password: PropTypes.string,
     // user state
     user: PropTypes.shape({
@@ -67,7 +74,7 @@ LoginForm.propTypes = {
 
 const mapStateToProps = (state) => ({
     email: state.loginForm.email,
-    errorMessage: state.loginForm.errorMessage,
+    error: state.loginForm.error,
     password: state.loginForm.password,
     user: state.user
 });
