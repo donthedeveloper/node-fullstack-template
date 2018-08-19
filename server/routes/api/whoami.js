@@ -6,7 +6,7 @@ router.get('/', (req, res, next) => {
     const session = req.session;
     const userId = session ? req.session.userId : null;
     if (!userId) {
-        return res.send({user: null});
+        return res.json({user: null});
     }
 
     return User.findById(userId).select('-password')

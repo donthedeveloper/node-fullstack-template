@@ -1,10 +1,13 @@
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {authenticate, setLoginEmail, setLoginPassword} from './Login.actions';
-import {updateStoreWithUser} from '../User.actions';
+import {authenticate, resetLoginState, setLoginEmail, setLoginPassword} from './LoginForm.actions';
 
-class Login extends Component {
+class LoginForm extends Component {
+
+    componentWillUnmount = () => {
+        this.props.resetLoginState();
+    }
 
     handleSubmit = (e) => {
         e.preventDefault();
@@ -45,23 +48,28 @@ class Login extends Component {
     }
 }
 
-Login.propTypes = {
+LoginForm.propTypes = {
+    // login state
     email: PropTypes.string,
     errorMessage: PropTypes.string,
     password: PropTypes.string,
+    // user state
     user: PropTypes.shape({
         _id: PropTypes.string,
         email: PropTypes.string,
-        password: PropTypes.string
-    })
-    // TODO: check action creators attached to props
+    }),
+    // login action creators
+    authenticate: PropTypes.func.isRequired,
+    resetLoginState: PropTypes.func.isRequired,
+    setLoginEmail: PropTypes.func.isRequired,
+    setLoginPassword: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
-    email: state.loginReducer.email,
-    errorMessage: state.loginReducer.errorMessage,
-    password: state.loginReducer.password,
+    email: state.loginForm.email,
+    errorMessage: state.loginForm.errorMessage,
+    password: state.loginForm.password,
     user: state.user
 });
 
-export default connect(mapStateToProps, {authenticate, setLoginEmail, setLoginPassword, updateStoreWithUser})(Login);
+export default connect(mapStateToProps, {authenticate, resetLoginState, setLoginEmail, setLoginPassword})(LoginForm);

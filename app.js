@@ -15,10 +15,11 @@ const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 
 app.use(session({
-  // TODO: put this in the env
-  secret: 'TODO: make this an env var',
+  maxAge: 1000 * 60 * 60 * 24 * 7,
   resave: true,
   saveUnitialized: false,
+  // TODO: put this in the env
+  secret: 'TODO: make this an env var',
   store: new MongoStore({
     mongooseConnection: db
   })

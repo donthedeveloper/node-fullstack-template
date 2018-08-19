@@ -79,7 +79,7 @@ describe('\'/api/user\' Route', function() {
             });
         });
 
-        describe('made with duplicate (unique) email', function() {
+        describe('made with duplicate email, which should be unique', function() {
             const status = 400;
             it(`responds with a status of ${status} and includes message '${emailDuplicateErrorMessage}'`, async function() {
                 await User.create({email, password});
@@ -88,9 +88,6 @@ describe('\'/api/user\' Route', function() {
                     .post('/api/user')
                     .type('form')
                     .send({email, password})
-                        .then((response) => {
-                            expect(response).to.be.null; // TODO: is this even needed?
-                        })
                         .catch((error) => {
                             expect(error).to.have.status(status);
                             expect(error.response.body.error.name).to.equal(validationErrorName);
@@ -172,7 +169,7 @@ describe('\'/api/user\' Route', function() {
                     });
                 })
                 .catch((err) => {
-                    console.error(err);
+                    done(err);
                 });
             });
         });
@@ -204,19 +201,19 @@ describe('\'/api/user\' Route', function() {
                 User.findOne({email: user1.email})
                     .then((user) => {
                         chai.request(app)
-                        .patch(`/api/user/${user._id}`)
-                        .type('form')
-                        .send({email: emailToChangeTo})
-                        .end(function(err, res) {
-                            expect(res).to.have.status(status);
-                            expect(res.body).to.have.property('user');
-                            expect(res.body.user).to.be.an('object');
-                            expect(res.body.user.email).to.equal(emailToChangeTo);
-                            done();
-                        });
+                            .patch(`/api/user/${user._id}`)
+                            .type('form')
+                            .send({email: emailToChangeTo})
+                            .end(function(err, res) {
+                                expect(res).to.have.status(status);
+                                expect(res.body).to.have.property('user');
+                                expect(res.body.user).to.be.an('object');
+                                expect(res.body.user.email).to.equal(emailToChangeTo);
+                                done();
+                            });
                     })
                     .catch((err) => {
-                        console.error(err);
+                        done(err);
                     });
             });
         });
@@ -238,8 +235,8 @@ describe('\'/api/user\' Route', function() {
                             });
                     })
                     .catch((err) => {
-                        console.error(err);
-                    })
+                        done(err);
+                    });
             });
         });
 

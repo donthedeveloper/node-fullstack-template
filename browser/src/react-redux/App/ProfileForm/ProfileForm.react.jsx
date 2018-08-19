@@ -1,17 +1,16 @@
-import axios from 'axios';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import React, {Component} from 'react';
-import {updateStoreWithUser} from '../User.actions';
-import {resetProfileErrorMessage, setProfileConfirmPassword, setProfileEmail, setProfileErrorMessage, setProfilePassword, updateProfile} from './Profile.actions';
+import {resetProfileState, setProfileConfirmPassword, setProfileEmail, setProfileErrorMessage, setProfilePassword, updateProfile} from './ProfileForm.actions';
 
-class Profile extends Component {
-    
-    // TODO: sketch stream of signup/login/profile pages
-    // TODO: style components!
+class ProfileForm extends Component {
 
     componentDidMount = () => {
         this.props.setProfileEmail(this.props.user.email);
+    }
+
+    componentWillUnmount = () => {
+        this.props.resetProfileState();
     }
 
     handleConfirmPasswordChange = (e) => {
@@ -33,9 +32,6 @@ class Profile extends Component {
         if (password && password !== this.props.confirmPassword) {
             this.props.setProfileErrorMessage('Passwords must match.');
         }
-        // TODO: reset profile error message, as well as password/confirm password on successful update
-        // this.props.resetProfileErrorMessage();
-        console.log('id:', this.props.user._id);
         this.props.updateProfile(this.props.user._id, this.props.email, this.props.password);
     }
 
@@ -73,35 +69,37 @@ class Profile extends Component {
     }
 }
 
-Profile.propTypes = {
+ProfileForm.propTypes = {
+    // profile state
     email: PropTypes.string,
     errorMessage: PropTypes.string,
     password: PropTypes.string,
     confirmPassword: PropTypes.string,
+    // user state
     user: PropTypes.shape({
         _id: PropTypes.string,
-        email: PropTypes.string,
-        password: PropTypes.string
-    })
+        email: PropTypes.string
+    }),
+    // profile action creators
+    resetProfileState: PropTypes.func.isRequired,
+    setProfileConfirmPassword: PropTypes.func.isRequired,
+    setProfileEmail: PropTypes.func.isRequired,
+    setProfileErrorMessage: PropTypes.func.isRequired,
+    setProfilePassword: PropTypes.func.isRequired,
+    updateProfile: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) => ({
-    email: state.profileReducer.email,
-    errorMessage: state.profileReducer.errorMessage,
-    password: state.profileReducer.password,
-    confirmPassword: state.profileReducer.confirmPassword,
+    // profile state
+    email: state.profileForm.email,
+    errorMessage: state.profileForm.errorMessage,
+    password: state.profileForm.password,
+    confirmPassword: state.profileForm.confirmPassword,
+    // user state
     user: state.user
 });
 
 export default connect(
     mapStateToProps,
-    {
-        resetProfileErrorMessage,
-        setProfileConfirmPassword,
-        setProfileEmail,
-        setProfileErrorMessage,
-        setProfilePassword,
-        updateProfile,
-        updateStoreWithUser
-    }
-)(Profile);
+    {resetProfileState, setProfileConfirmPassword, setProfileEmail, setProfileErrorMessage, setProfilePassword, updateProfile}
+)(ProfileForm);

@@ -1,10 +1,13 @@
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {sendSignupData, setSignupConfirmPassword, setSignupEmail, setSignupErrorMessage, setSignupPassword} from './Signup.actions';
-import {updateStoreWithUser} from '../User.actions';
+import {resetSignupState, sendSignupData, setSignupConfirmPassword, setSignupEmail, setSignupErrorMessage, setSignupPassword} from './SignupForm.actions';
 
-class Signup extends Component {
+class SignupForm extends Component {
+
+    componentWillUnmount = () => {
+        this.props.resetSignupState();
+    }
 
     handleConfirmPasswordChange = (e) => {
         this.props.setSignupConfirmPassword(e.target.value);
@@ -64,25 +67,37 @@ class Signup extends Component {
     }
 }
 
-Signup.propTypes = {
+SignupForm.propTypes = {
+    // signup state
     confirmPassword: PropTypes.string,
     email: PropTypes.string,
     errorMessage: PropTypes.string,
     password: PropTypes.string,
+    // user state
     user: PropTypes.shape({
         _id: PropTypes.string,
-        email: PropTypes.string,
-        password: PropTypes.string
-    })
-    // TODO: check action creators attached to props
+        email: PropTypes.string
+    }),
+    // signup action creators
+    resetSignupState: PropTypes.func.isRequired,
+    sendSignupData: PropTypes.func.isRequired,
+    setSignupConfirmPassword: PropTypes.func.isRequired,
+    setSignupEmail: PropTypes.func.isRequired,
+    setSignupErrorMessage: PropTypes.func.isRequired,
+    setSignupPassword: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
-    confirmPassword: state.signupReducer.confirmPassword,
-    email: state.signupReducer.email,
-    errorMessage: state.signupReducer.errorMessage,
-    password: state.signupReducer.password,
+    // signup state
+    confirmPassword: state.signupForm.confirmPassword,
+    email: state.signupForm.email,
+    errorMessage: state.signupForm.errorMessage,
+    password: state.signupForm.password,
+    // user state
     user: state.user
 });
 
-export default connect(mapStateToProps, {sendSignupData, setSignupConfirmPassword, setSignupEmail, setSignupErrorMessage, setSignupPassword, updateStoreWithUser})(Signup);
+export default connect(
+    mapStateToProps,
+    {resetSignupState, sendSignupData, setSignupConfirmPassword, setSignupEmail, setSignupErrorMessage, setSignupPassword}
+)(SignupForm);

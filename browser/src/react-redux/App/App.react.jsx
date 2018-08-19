@@ -1,11 +1,11 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {connect} from 'react-redux';
 import {Switch, Redirect} from 'react-router';
-import {Route} from 'react-router-dom';
-import Login from './Login/Login.react';
-import Profile from './Profile/Profile.react';
-import Signup from './Signup/Signup.react';
-import {updateStoreWithUser} from './User.actions';
+import {Link, Route} from 'react-router-dom';
+import LoginForm from './LoginForm/LoginForm.react';
+import ProfileForm from './ProfileForm/ProfileForm.react';
+import SignupForm from './SignupForm/SignupForm.react';
+import {logout, updateStoreWithUser} from './User.actions';
 
 const AuthenticatedRoute = ({isAllowed, ...props}) =>
     isAllowed
@@ -17,8 +17,24 @@ const UnauthenticatedRoute = ({isAllowed, ...props}) =>
         ? <Route {...props} />
         : <Redirect to='/profile' />;
 
-class App extends Component {
+class App extends React.Component {
+
+    getSnapShotBeforeUpdate = (prevProps) => {
+        if (prevProps.user !== this.props.user) {
+            this.updateWhenUserDoesntExist();
+        }
+    }
+
     componentDidMount() {
+        this.updateWhenUserDoesntExist();
+    }
+
+    logout = (e) => {
+        e.preventDefault();
+        this.props.logout();
+    }
+
+    updateWhenUserDoesntExist() {
         if (!this.props.user) {
             this.props.updateStoreWithUser();
         }
@@ -28,22 +44,28 @@ class App extends Component {
         const user = this.props.user;
         return (
             <div>
+                <ul>
+                    <li><Link to='/login'>Login</Link></li>
+                    <li><Link to='/signup'>Signup</Link></li>
+                    <li><Link to='/profile'>Profile</Link></li>
+                    <li><a href='' onClick={this.logout}>Logout</a></li>
+                </ul>
                 <Switch>
                     <Route exact path='/' component={null} />
                     <UnauthenticatedRoute
                         isAllowed={!user}
                         path='/login'
-                        component={Login}
+                        component={LoginForm}
                     />
                     <UnauthenticatedRoute
                         isAllowed={!user}
                         path='/signup'
-                        component={Signup}
+                        component={SignupForm}
                     />
                     <AuthenticatedRoute
                         isAllowed={user}
                         path='/profile'
-                        component={Profile}
+                        component={ProfileForm}
                     />
                 </Switch>
             </div>
@@ -51,8 +73,10 @@ class App extends Component {
     }
 };
 
+// TODO: check user for proptypes
+
 const mapStateToProps = (state) => ({
     user: state.user
 });
 
-export default connect(mapStateToProps, {updateStoreWithUser})(App);
+export default connect(mapStateToProps, {logout, updateStoreWithUser})(App);

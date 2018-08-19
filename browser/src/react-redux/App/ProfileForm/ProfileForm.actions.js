@@ -51,6 +51,7 @@ export const updateProfile = (userId, email, password) =>
                     dispatch(setProfileErrorMessage(`You don't exist.`));
                 }
 
+                // TODO: @node-fullstack-template/issues/24
                 if (err.response.status === 400) {
                     let errorMessage;
                     const errorData = err.response.data.error;

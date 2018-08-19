@@ -18,7 +18,7 @@
     "nunjucks": "^3.0.1",
     "nunjucks-autoescape": "^1.0.1",
     "prop-types": "^15.6.2",
-    "react": "^16.2.0",
+    "react": "^16.4.2",
     "react-dom": "^16.2.0",
     "react-redux": "^5.0.7",
     "react-router-dom": "^4.2.2",

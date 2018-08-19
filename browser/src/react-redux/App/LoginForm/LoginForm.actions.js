@@ -36,6 +36,7 @@ export const authenticate = (email, password) =>
                 dispatch(resetLoginState());
             })
             .catch((err) => {
+                // TODO: @node-fullstack-template/issues/24
                 console.log('err response:', err.response);
                 dispatch(setLoginErrorMessage(err.response.data.error.message));
             });

@@ -22,7 +22,7 @@ describe('\'/api/logout\' Route', function() {
                     done();
                 })
                 .catch((err) => {
-                    console.error(err);
+                    done(err);
                 });
         });
     });
@@ -45,6 +45,9 @@ describe('\'/api/logout\' Route', function() {
                 .catch((err) => {
                     done(err);
                 });
+            })
+            .catch((err) => {
+                done(err);
             })
         });
     });

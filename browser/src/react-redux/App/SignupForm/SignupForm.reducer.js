@@ -7,6 +7,7 @@ const SET_SIGNUP_PASSWORD = 'SET_SIGNUP_PASSWORD';
 const RESET_SIGNUP_STATE = 'RESET_SIGNUP_STATE';
 
 const initialState = {
+    confirmPassword: '',
     email: '',
     password: '',
     errorMessage: ''

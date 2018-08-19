@@ -16,3 +16,13 @@ export const updateStoreWithUser = () =>
             .catch((err) => {
                 console.error(err);
             });
+
+export const logout = () =>
+    dispatch =>
+        axios.get('/api/logout')
+            .then((res) => {
+                dispatch(updateStoreWithUser());
+            })
+            .catch((err) => {
+                console.error(err);
+            });

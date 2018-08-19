@@ -43,5 +43,19 @@ export const sendSignupData = (email, password) =>
                 dispatch(resetSignupState());
             })
             .catch((err) => {
-                dispatch(setSignupErrorMessage(err.response.data.message));
+                console.log('message:', err.response.data.message);
+                dispatch(setSignupErrorMessage(errorData.errors.email.message));
+
+                if (err.response.status === 400) {
+                    let errorMessage;
+
+                    const errorData = err.response.data.error;
+                    // TODO: we should be checking for password field as well @node-fullstack-template/issues/24
+                    if (err.response.data.error.errors) {
+                        errorMessage = errorData.errors.email.message;
+                    } else {
+                        errorMessage = errorData.message;
+                    }
+                    dispatch(setProfileErrorMessage(errorMessage));
+                }
             });
