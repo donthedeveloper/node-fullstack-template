@@ -9,21 +9,24 @@ const nunjucks = require('nunjucks');
 const session = require('express-session'),
   MongoStore = require('connect-mongo')(session);
 
+// TODO: put as env variable
 mongoose.connect('mongodb://localhost:27017/fstemplate');
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 
 app.use(session({
-  secret: 'TODO: make this an env var',
+  maxAge: 1000 * 60 * 60 * 24 * 7,
   resave: true,
   saveUnitialized: false,
+  // TODO: put this in the env
+  secret: 'TODO: make this an env var',
   store: new MongoStore({
     mongooseConnection: db
   })
 }));
 
 // middleware
-// app.use(morgan('dev'));
+app.use(morgan('dev'));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
