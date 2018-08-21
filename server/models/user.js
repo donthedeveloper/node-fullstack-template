@@ -30,27 +30,30 @@ UserSchema.plugin(uniqueValidator, {
     message: 'This email address is already taken.'
 });
 
-UserSchema.statics.authenticate = function(email, password, callback) {
-    User.findOne({email})
-        .exec(function (error, user) {
-            const errorObj = {
-                message: 'Incorrect username and password combination.',
-                name: 'AuthenticationError'
-            };
+UserSchema.statics.authenticate = async function(email, password) {
+    try {
+        const errorObj = {
+            message: 'Incorrect username and password combination.',
+            name: 'AuthenticationError'
+        };
 
-            if (error || !user) {
-                return callback(errorObj); // TODO: this isnt actually an auth error, this is a mongo or schema error
-            }
+        const user = await User.findOne({email});
+        if (!user) {
+            throw new Error();
+        }
 
-
+        return new Promise((resolve, reject) => {
             bcrypt.compare(password, user.password, function(error, result) {
                 if (result === true) {
-                    return callback(null, user);
+                    resolve(user);
                 } else {
-                    return callback(errorObj);
+                    reject(errorObj);
                 }
             });
-        });
+        })
+    } catch(e) {
+        return Promise.reject(errorObj);
+    }
 }
 
 UserSchema.pre('findOneAndUpdate', function(next) {

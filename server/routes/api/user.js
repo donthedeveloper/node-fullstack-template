@@ -3,17 +3,10 @@ const express = require('express'),
 const mongoose = require('mongoose');
 const User = require('../../models/user');
 
-router.patch('/:userId', (req, res, next) => {
+router.patch('/:userId', async (req, res, next) => {
     const {email, password} = req.body;
+    const oldPassword = req.body.old_password;
     const userId = req.params.userId;
-
-    const fields = {};
-    if (req.body.hasOwnProperty('email')) {
-        fields.email = email;
-    }
-    if (password) {
-        fields.password = password
-    }
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
         const error = {
@@ -23,26 +16,81 @@ router.patch('/:userId', (req, res, next) => {
         return next(error);
     }
 
-    User.findByIdAndUpdate(userId, fields, {
+    const fields = {};
+    if (req.body.hasOwnProperty('email')) {
+        fields.email = email;
+    }
+    // if (password) {
+    //     fields.password = password
+    // }
+
+    // const user = await User.findById(userId).select('-password');
+    const user = await User.findById(userId);
+    if (!user) {
+        // TODO: should we even tell them the user exists? maybe just throw a 500
+        // TODO: why aren't we simply passing this through to next?
+        res.status(404);
+        return res.json({
+            error: {
+                message: `User doesn't exist.`
+            }
+        });
+    }
+
+    // TODO: we need to error out when password is filled but old password is not
+    if (oldPassword) {
+        try {
+            await User.authenticate(user.email, oldPassword);
+
+            if (password) {
+                fields.password = password;
+            }
+        } catch(e) {
+            e.message = 'Incorrect current password.';
+            return next(e);
+        }
+    }
+
+    return User.findByIdAndUpdate(userId, fields, {
         context: 'query',
         new: true,
         runValidators: true
     }).select('-password')
-        .exec((error, user) => {
-            if (error) {
-                return next(error);
-            }
-            if (!user) {
-                res.status(404);
-                return res.json({
-                    error: {
-                        message: `User doesn't exist.`
-                    }
-                });
-            }
-
-            res.json({user});
+        .then((user) => {
+            return res.json({user});
+        })
+        .catch((err) => {
+            return next(err);
         });
+
+        // .exec((error, user) => {
+
+        //     User.authenticate(user.email, oldPassword, function(error) {
+        //         if (err) {
+        //             return next(error);
+        //         }
+        //     });
+
+        //     res.json({user});
+        // });
+
+    // return user.update(fields)
+    //     .then(() => {
+    //         console.log('user:', user);
+    //         return res.json(user);
+    //     })
+    //     .catch((err) => {
+    //         return next(err);
+    //     })
+
+    // User.findByIdAndUpdate(userId, fields, {
+    //     context: 'query',
+    //     new: true,
+    //     runValidators: true
+    // }).select('-password')
+    //     .exec((error, user) => {
+    //         res.json({user});
+    //     });
 });
 
 router.post('/', (req, res, next) => {
