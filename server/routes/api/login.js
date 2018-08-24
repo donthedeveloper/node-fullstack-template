@@ -4,15 +4,15 @@ const User = require('../../models/user');
 
 router.post('/', (req, res, next) => {
     const {email, password} = req.body;
-    
-    User.authenticate(email, password, function(error, user) {
-        if (error || !user) {
-            return next(error);
-        } else {
+
+    return User.authenticate(email, password)
+        .then((user) => {
             req.session.userId = user._id;
             res.sendStatus(200);
-        }
-    });
+        })
+        .catch((err) => {
+            return next(err);
+        });
 });
 
 module.exports = router;

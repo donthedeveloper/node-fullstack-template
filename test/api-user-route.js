@@ -103,6 +103,7 @@ describe('\'/api/user\' Route', function() {
 
     describe('PATCH Request', function() {
         const emailToChangeTo = 'thisisnotarealemail3@gmail.com';
+        const password = 'test';
         const user1 = {
             email: 'thisisnotarealemail@gmail.com',
             password: 'password'
@@ -283,6 +284,34 @@ describe('\'/api/user\' Route', function() {
                                 expect(res).to.have.status(status);
                                 expect(err.response.body.error.name).to.equal(validationErrorName);
                                 expect(err.response.body.error.errors.email.message).to.equal(emailDuplicateErrorMessage);
+                                done();
+                            });
+                    })
+                    .catch((err) => {
+                        done(err);
+                    });
+            });
+        });
+
+        describe('made with a new password, without providing a current (old) password', function() {
+            const status = 400;
+            const errorMessage = 'If your old password is provided, it is assumed that you are trying to change your password. Please provide a new password.';
+            it(`responds with status ${status} and includes message '${errorMessage}`, function(done) {
+                User.findOne({email: user1.email})
+                    .then((user) => {
+                        chai.request(app)
+                            .patch(`/api/user/${user._id}`)
+                            .type('form')
+                            .send({
+                                email: emailToChangeTo,
+                                password
+                            })
+                            .end(function(err, res) {
+                                expect(res).to.have.status(status);
+                                expect(err.response.body.error.name).to.equal(validationErrorName);
+                                // TODO: build a virtual for old password and let it hit model password validation
+                                    // this will easily build the error object up appropriately so we can test it
+                                // expect(err.response.body.error.errors.password.message).to.equal(errorMessage);
                                 done();
                             });
                     })

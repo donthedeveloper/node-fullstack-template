@@ -20,9 +20,6 @@ router.patch('/:userId', async (req, res, next) => {
     if (req.body.hasOwnProperty('email')) {
         fields.email = email;
     }
-    // if (password) {
-    //     fields.password = password
-    // }
 
     // const user = await User.findById(userId).select('-password');
     const user = await User.findById(userId);
@@ -33,12 +30,29 @@ router.patch('/:userId', async (req, res, next) => {
         return res.json({
             error: {
                 message: `User doesn't exist.`
+                // TODO: label this with a custom name. What should it be?
             }
         });
     }
 
+    if (password && !oldPassword) {
+        const error = {
+            message: 'Current password required in order to change password.',
+            name: 'ValidationError'
+        }
+        return next(error);
+    }
+
+    if (!password && oldPassword) {
+        const error = {
+            message: 'If your old password is provided, it is assumed that you are trying to change your password. Please provide a new password.',
+            name: 'ValidationError'
+        }
+        return next(error);
+    }
+
     // TODO: we need to error out when password is filled but old password is not
-    if (oldPassword) {
+    if (password && oldPassword) {
         try {
             await User.authenticate(user.email, oldPassword);
 

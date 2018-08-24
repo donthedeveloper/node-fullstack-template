@@ -31,12 +31,12 @@ UserSchema.plugin(uniqueValidator, {
 });
 
 UserSchema.statics.authenticate = async function(email, password) {
-    try {
-        const errorObj = {
-            message: 'Incorrect username and password combination.',
-            name: 'AuthenticationError'
-        };
+    const errorObj = {
+        message: 'Incorrect username and password combination.',
+        name: 'AuthenticationError'
+    };
 
+    try {
         const user = await User.findOne({email});
         if (!user) {
             throw new Error();
