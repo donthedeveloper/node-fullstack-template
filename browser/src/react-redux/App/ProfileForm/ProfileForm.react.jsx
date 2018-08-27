@@ -1,7 +1,16 @@
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import React, {Component} from 'react';
-import {resetProfileState, setProfileConfirmPassword, setProfileEmail, setProfileError, setProfilePassword, updateProfile} from './ProfileForm.actions';
+import {
+    pushProfileError,
+    resetProfileState,
+    setProfileConfirmPassword,
+    setProfileEmail,
+    setProfileError,
+    setProfileOldPassword,
+    setProfilePassword,
+    updateProfile
+} from './ProfileForm.actions';
 
 class ProfileForm extends Component {
 
@@ -21,6 +30,10 @@ class ProfileForm extends Component {
         this.props.setProfileEmail(e.target.value);
     };
 
+    handleOldPasswordChange = (e) => {
+        this.props.setProfileOldPassword(e.target.value);
+    }
+
     handlePasswordChange = (e) => {
         this.props.setProfilePassword(e.target.value);
     };
@@ -28,11 +41,27 @@ class ProfileForm extends Component {
     handleSubmit = (e) => {
         e.preventDefault();
 
-        const password = this.props.password;
+        const {email, oldPassword, password} = this.props;
         if (password && password !== this.props.confirmPassword) {
-            this.props.setProfileErrorMessage('Passwords must match.');
+            return this.props.pushProfileError({
+                field: 'old_password',
+                message: 'Passwords must match.'
+            });
         }
-        this.props.updateProfile(this.props.user._id, this.props.email, this.props.password);
+        
+        const id = this.props.user._id;
+        const updatedUser = {};
+        if (email) {
+            updatedUser.email = email;
+        }
+        if (oldPassword) {
+            updatedUser.oldPassword = oldPassword;
+        }
+        if (password) {
+            updatedUser.password = password;
+        }
+
+        this.props.updateProfile({id, ...updatedUser});
     }
 
     render() {
@@ -50,6 +79,14 @@ class ProfileForm extends Component {
                     required
                     type='email'
                     value={this.props.email}
+                />
+                <label htmlFor='old_password'>Old Password:</label>
+                <input
+                    id='old_password'
+                    onChange={this.handleOldPasswordChange}
+                    required={Boolean(this.props.password)}
+                    type='password'
+                    value={this.props.oldPassword}
                 />
                 <label htmlFor='password'>Password:</label>
                 <input
@@ -88,10 +125,12 @@ ProfileForm.propTypes = {
         email: PropTypes.string
     }),
     // profile action creators
+    pushProfileError: PropTypes.func.isRequired,
     resetProfileState: PropTypes.func.isRequired,
     setProfileConfirmPassword: PropTypes.func.isRequired,
     setProfileEmail: PropTypes.func.isRequired,
     setProfileError: PropTypes.func.isRequired,
+    setProfileOldPassword: PropTypes.func.isRequired,
     setProfilePassword: PropTypes.func.isRequired,
     updateProfile: PropTypes.func.isRequired
 };
@@ -100,6 +139,7 @@ const mapStateToProps = (state) => ({
     // profile state
     email: state.profileForm.email,
     error: state.profileForm.error,
+    oldPassword: state.profileForm.oldPassword,
     password: state.profileForm.password,
     confirmPassword: state.profileForm.confirmPassword,
     // user state
@@ -108,5 +148,5 @@ const mapStateToProps = (state) => ({
 
 export default connect(
     mapStateToProps,
-    {resetProfileState, setProfileConfirmPassword, setProfileEmail, setProfileError, setProfilePassword, updateProfile}
+    {pushProfileError, resetProfileState, setProfileConfirmPassword, setProfileEmail, setProfileError, setProfileOldPassword, setProfilePassword, updateProfile}
 )(ProfileForm);

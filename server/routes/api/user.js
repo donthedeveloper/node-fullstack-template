@@ -3,17 +3,10 @@ const express = require('express'),
 const mongoose = require('mongoose');
 const User = require('../../models/user');
 
-router.patch('/:userId', (req, res, next) => {
+router.patch('/:userId', async (req, res, next) => {
     const {email, password} = req.body;
+    const oldPassword = req.body.old_password;
     const userId = req.params.userId;
-
-    const fields = {};
-    if (req.body.hasOwnProperty('email')) {
-        fields.email = email;
-    }
-    if (password) {
-        fields.password = password
-    }
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
         const error = {
@@ -23,25 +16,43 @@ router.patch('/:userId', (req, res, next) => {
         return next(error);
     }
 
-    User.findByIdAndUpdate(userId, fields, {
-        context: 'query',
-        new: true,
-        runValidators: true
-    }).select('-password')
-        .exec((error, user) => {
-            if (error) {
-                return next(error);
-            }
-            if (!user) {
-                res.status(404);
-                return res.json({
-                    error: {
-                        message: `User doesn't exist.`
-                    }
-                });
-            }
+    const fields = {};
+    if (req.body.hasOwnProperty('email')) {
+        fields.email = email;
+    }
 
-            res.json({user});
+    const user = await User.findById(userId).select('-password');
+    if (!user) {
+        // TODO: should we even tell them the user exists? maybe just throw a 500
+        // TODO: why aren't we simply passing this through to next?
+        res.status(404);
+        return res.json({
+            error: {
+                message: `User doesn't exist.`
+                // TODO: label this with a custom name. What should it be? Authentication?
+            }
+        });
+    }
+
+    if (req.body.hasOwnProperty('email')) {
+        user.email = email;
+    }
+
+    if (req.body.hasOwnProperty('old_password')) {
+        user.old_password = oldPassword;
+    }
+
+    if (req.body.hasOwnProperty('password')) {
+        user.password = password;
+    }
+
+    return user
+        .save()
+        .then((user) => {
+            return res.json({user});
+        })
+        .catch((err) => {
+            return next(err);
         });
 });
 
