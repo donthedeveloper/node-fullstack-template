@@ -21,8 +21,7 @@ router.patch('/:userId', async (req, res, next) => {
         fields.email = email;
     }
 
-    // const user = await User.findById(userId).select('-password');
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).select('-password');
     if (!user) {
         // TODO: should we even tell them the user exists? maybe just throw a 500
         // TODO: why aren't we simply passing this through to next?
@@ -30,81 +29,31 @@ router.patch('/:userId', async (req, res, next) => {
         return res.json({
             error: {
                 message: `User doesn't exist.`
-                // TODO: label this with a custom name. What should it be?
+                // TODO: label this with a custom name. What should it be? Authentication?
             }
         });
     }
 
-    if (password && !oldPassword) {
-        const error = {
-            message: 'Current password required in order to change password.',
-            name: 'ValidationError'
-        }
-        return next(error);
+    if (req.body.hasOwnProperty('email')) {
+        user.email = email;
     }
 
-    if (!password && oldPassword) {
-        const error = {
-            message: 'If your old password is provided, it is assumed that you are trying to change your password. Please provide a new password.',
-            name: 'ValidationError'
-        }
-        return next(error);
+    if (req.body.hasOwnProperty('old_password')) {
+        user.old_password = oldPassword;
     }
 
-    // TODO: we need to error out when password is filled but old password is not
-    if (password && oldPassword) {
-        try {
-            await User.authenticate(user.email, oldPassword);
-
-            if (password) {
-                fields.password = password;
-            }
-        } catch(e) {
-            e.message = 'Incorrect current password.';
-            return next(e);
-        }
+    if (req.body.hasOwnProperty('password')) {
+        user.password = password;
     }
 
-    return User.findByIdAndUpdate(userId, fields, {
-        context: 'query',
-        new: true,
-        runValidators: true
-    }).select('-password')
+    return user
+        .save()
         .then((user) => {
             return res.json({user});
         })
         .catch((err) => {
             return next(err);
         });
-
-        // .exec((error, user) => {
-
-        //     User.authenticate(user.email, oldPassword, function(error) {
-        //         if (err) {
-        //             return next(error);
-        //         }
-        //     });
-
-        //     res.json({user});
-        // });
-
-    // return user.update(fields)
-    //     .then(() => {
-    //         console.log('user:', user);
-    //         return res.json(user);
-    //     })
-    //     .catch((err) => {
-    //         return next(err);
-    //     })
-
-    // User.findByIdAndUpdate(userId, fields, {
-    //     context: 'query',
-    //     new: true,
-    //     runValidators: true
-    // }).select('-password')
-    //     .exec((error, user) => {
-    //         res.json({user});
-    //     });
 });
 
 router.post('/', (req, res, next) => {

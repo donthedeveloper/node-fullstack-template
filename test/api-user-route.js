@@ -104,6 +104,7 @@ describe('\'/api/user\' Route', function() {
     describe('PATCH Request', function() {
         const emailToChangeTo = 'thisisnotarealemail3@gmail.com';
         const password = 'test';
+        const oldPasswordThatDoesntWork = 'oldPasswordThatDoesntWork';
         const user1 = {
             email: 'thisisnotarealemail@gmail.com',
             password: 'password'
@@ -225,7 +226,7 @@ describe('\'/api/user\' Route', function() {
                         done(err);
                     });
             });
-        })
+        });
 
         // // TODO: get async await to work in tests
         // describe('made with an empty payload', function() {
@@ -295,7 +296,7 @@ describe('\'/api/user\' Route', function() {
 
         describe('made with a new password, without providing a current (old) password', function() {
             const status = 400;
-            const errorMessage = 'If your old password is provided, it is assumed that you are trying to change your password. Please provide a new password.';
+            const errorMessage = 'Old password required in order to change password.';
             it(`responds with status ${status} and includes message '${errorMessage}`, function(done) {
                 User.findOne({email: user1.email})
                     .then((user) => {
@@ -309,9 +310,85 @@ describe('\'/api/user\' Route', function() {
                             .end(function(err, res) {
                                 expect(res).to.have.status(status);
                                 expect(err.response.body.error.name).to.equal(validationErrorName);
-                                // TODO: build a virtual for old password and let it hit model password validation
-                                    // this will easily build the error object up appropriately so we can test it
-                                // expect(err.response.body.error.errors.password.message).to.equal(errorMessage);
+                                expect(err.response.body.error.errors.old_password.message).to.equal(errorMessage);
+                                done();
+                            });
+                    })
+                    .catch((err) => {
+                        done(err);
+                    });
+            });
+        });
+
+        describe('Providing a current (old) password, but not including a new password', function() {
+            const status = 400;
+            const errorMessage = 'If your old password is provided, it is assumed that you are trying to change your password. Please provide a new password.';
+            it(`responds with status ${status} and includes message '${errorMessage}`, function(done) {
+                User.findOne({email: user1.email})
+                    .then((user) => {
+                        chai.request(app)
+                            .patch(`/api/user/${user._id}`)
+                            .type('form')
+                            .send({
+                                email: emailToChangeTo,
+                                old_password: user1.password
+                            })
+                            .end(function(err, res) {
+                                expect(res).to.have.status(status);
+                                expect(err.response.body.error.name).to.equal(validationErrorName);
+                                expect(err.response.body.error.errors.password.message).to.equal(errorMessage);
+                                done();
+                            });
+                    })
+                    .catch((err) => {
+                        done(err);
+                    });
+            });
+        });
+
+        describe('Providing an incorrect old password, and a new password', function() {
+            const status = 400;
+            const errorMessage = 'Invalid old password.';
+            it(`responds with status ${status} and includes message '${errorMessage}`, function(done) {
+                User.findOne({email: user1.email})
+                    .then((user) => {
+                        chai.request(app)
+                            .patch(`/api/user/${user._id}`)
+                            .type('form')
+                            .send({
+                                email: emailToChangeTo,
+                                old_password: oldPasswordThatDoesntWork,
+                                password
+                            })
+                            .end(function(err, res) {
+                                expect(res).to.have.status(status);
+                                expect(err.response.body.error.name).to.equal(validationErrorName);
+                                expect(err.response.body.error.errors.old_password.message).to.equal(errorMessage);
+                                done();
+                            });
+                    })
+                    .catch((err) => {
+                        done(err);
+                    });
+            });
+        });
+
+        describe('Providing a correct old password, and a new password', function() {
+            const status = 200;
+            it(`responds with status ${status}`, function(done) {
+                User.findOne({email: user1.email})
+                    .then((user) => {
+                        chai.request(app)
+                            .patch(`/api/user/${user._id}`)
+                            .type('form')
+                            .send({
+                                old_password: user1.password,
+                                password
+                            })
+                            .end(function(err, res) {
+                                expect(res).to.have.status(status);
+                                expect(res.body).to.have.property('user');
+                                expect(res.body.user).to.be.an('object');
                                 done();
                             });
                     })
