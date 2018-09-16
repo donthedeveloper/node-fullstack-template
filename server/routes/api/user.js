@@ -26,6 +26,7 @@ router.patch('/:userId', async (req, res, next) => {
         // TODO: should we even tell them the user exists? maybe just throw a 500
         // TODO: why aren't we simply passing this through to next?
         res.status(404);
+        // TODO: shouldn't this just pass it through next
         return res.json({
             error: {
                 message: `User doesn't exist.`
