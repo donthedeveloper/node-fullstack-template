@@ -26,7 +26,7 @@ app.use(session({
 }));
 
 // middleware
-app.use(morgan('dev'));
+// app.use(morgan('dev'));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
