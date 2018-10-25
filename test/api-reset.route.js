@@ -92,8 +92,6 @@ describe('\'/api/reset/:token\' Route', () => {
     });
 
     describe('POST request', function() {
-        const newPassword = 'thisisanewpassword';
-
         beforeEach(function() {
             return User.create({email, password});
         });
@@ -172,42 +170,34 @@ describe('\'/api/reset/:token\' Route', () => {
             });
         });
 
-        // TODO: check that it WORKS!
-
-        // TODO: this isnt necessary (I THINK) because what is an incorrect password
-        // describe(`send with a token that is valid, with an incorrect password`, function() {
-        //     const invalidPassword = 'invalidPassword';
-        //     const passwordInvalidErrorMessage = 'Invalid old password.';
-        //     const status = 400;
-        //     const validationErrorName = 'ValidationError';
-        //     it(`responds with status ${status} and error message ${tokenErrorMessage}`, function(done) {
-        //         chai.request(app)
-        //             .post('/api/forgot')
-        //             .type('form')
-        //             .send({email})
-        //             .end((err, res) => {
-        //                 User.findOne({email})
-        //                     .then((user) => {
-        //                         chai.request(app)
-        //                             .post(`/api/reset/${user.resetPassword.token}`)
-        //                             .type('form')
-        //                             .send({password: invalidPassword})
-        //                             .end((err, res) => {
-        //                                 console.log('err response body:', err.response.body);
-        //                                 // console.log('body:', res.body);
-        //                                 // console.log('res:', res.body.error.errors);
-        //                                 expect(res).to.have.status(status);
-        //                                 expect(err.response.body.error.name).to.equal(validationErrorName);
-        //                                 expect(err.response.body.error.errors.password.message).to.equal(passwordInvalidErrorMessage);
-        //                                 done();
-        //                             });
-        //                     })
-        //                     .catch((err) => {
-        //                         console.error(err);
-        //                     });
-        //             });
-        //     });
-        // });
+        describe(`send with a token that is valid, with a password`, function() {
+            const newPassword = 'thisisanewpassword';
+            const status = 200;
+            it(`responds with status ${status} and include user`, function(done) {
+                chai.request(app)
+                    .post('/api/forgot')
+                    .type('form')
+                    .send({email})
+                    .end((err, res) => {
+                        User.findOne({email})
+                            .then((user) => {
+                                chai.request(app)
+                                    .post(`/api/reset/${user.resetPassword.token}`)
+                                    .type('form')
+                                    .send({password: newPassword})
+                                    .end((err, res) => {
+                                        expect(res).to.have.status(status);
+                                        expect(res.body.user.email).to.equal(email);
+                                        expect(res.body.user).to.not.have.property('resetPassword');
+                                        done();
+                                    });
+                            })
+                            .catch((err) => {
+                                console.error(err);
+                            });
+                    });
+            });
+        });
 
         afterEach(function() {
             return User.remove({email});
