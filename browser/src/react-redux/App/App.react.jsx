@@ -5,6 +5,7 @@ import {Link, Route} from 'react-router-dom';
 import ForgotForm from './ForgotForm/ForgotForm.react';
 import LoginForm from './LoginForm/LoginForm.react';
 import ProfileForm from './ProfileForm/ProfileForm.react';
+import ResetForm from './ResetForm/ResetForm.react';
 import SignupForm from './SignupForm/SignupForm.react';
 import {logout, updateStoreWithUser} from './User.actions';
 
@@ -67,6 +68,11 @@ class App extends React.Component {
                         isAllowed={!user}
                         path='/forgot'
                         component={ForgotForm}
+                    />
+                    <UnauthenticatedRoute
+                        isAllowed={!user}
+                        path='/reset/:token?'
+                        component={ResetForm}
                     />
                     <AuthenticatedRoute
                         isAllowed={user}

@@ -42,6 +42,7 @@ router.post('/:token', async (req, res, next) => {
     user.password = req.body.password;
     try {
         user = await user.save();
+        req.session.userId = user._id; // todo: this needs a test
     } catch(e) {
         return next(e);
     }

@@ -39,8 +39,8 @@ export const sendSignupData = (email, password) =>
     dispatch =>
         axios.post('/api/user', {email, password})
             .then((res) => {
-                dispatch(updateStoreWithUser());
                 dispatch(resetSignupState());
+                dispatch(updateStoreWithUser());
             })
             .catch((err) => {
                 if (err.response.status === 400) {

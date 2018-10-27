@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
@@ -15,7 +16,7 @@ class ForgotForm extends Component {
 
     handleSubmit = (e) => {
         e.preventDefault();
-        this.props.requestToken();
+        this.props.requestToken(this.props.email);
     }
 
     generateForm() {
@@ -52,6 +53,15 @@ class ForgotForm extends Component {
         );
     }
 }
+
+ForgotForm.propTypes = {
+    // forgotForm state
+    email: PropTypes.string,
+    // profile action creators
+    requestToken: PropTypes.func.isRequired,
+    resetForgotForm: PropTypes.func.isRequired,
+    setForgotFormEmail: PropTypes.func.isRequired,
+};
 
 const mapStateToProps = (state) => ({
     email: state.forgotForm.email,

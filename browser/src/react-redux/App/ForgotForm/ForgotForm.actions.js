@@ -13,7 +13,7 @@ const _resetForgotFormEmail = () => ({
     type: RESET_FORGOT_FORM_EMAIL
 });
 
-export const setForgotFormEmailSent = (bool) => ({
+const _setForgotFormEmailSent = (bool) => ({
     type: SET_FORGOT_FORM_EMAIL_SENT,
     bool
 });
@@ -27,7 +27,7 @@ export const requestToken = (email) =>
     dispatch =>
         axios.post('/api/forgot', {email})
             .then((res) => {
-                dispatch(setForgotFormEmailSent(true));
+                dispatch(_setForgotFormEmailSent(true));
                 dispatch(_resetForgotFormEmail());
             });
             // todo: handle blank/invalid email, needs backend work

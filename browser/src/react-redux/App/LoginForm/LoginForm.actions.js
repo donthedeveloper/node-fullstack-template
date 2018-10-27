@@ -13,7 +13,7 @@ export const setLoginEmail = (email) => ({
     email
 });
 
-export const setLoginError = (error) => ({
+const _setLoginError = (error) => ({
     type: SET_LOGIN_ERROR,
     error
 });
@@ -32,11 +32,11 @@ export const authenticate = (email, password) =>
     dispatch =>
         axios.post('/api/login', {email, password})
             .then(() => {
-                dispatch(updateStoreWithUser());
                 dispatch(resetLoginState());
+                dispatch(updateStoreWithUser());
             })
             .catch((err) => {
                 if (err.response.status === 400) {
-                    dispatch(setLoginError(err.response.data.error));
+                    dispatch(_setLoginError(err.response.data.error));
                 }
             });

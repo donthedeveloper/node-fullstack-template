@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {setUser} from '../User.actions';
+import {updateStoreWithUser} from '../User.actions';
 
 // TODO: share constants file with reducer
 const PUSH_PROFILE_ERROR = 'PUSH_PROFILE_ERROR';
@@ -18,11 +18,11 @@ export const pushProfileError = (error) => ({
     error
 });
 
-export const resetProfilePasswords = () => ({
+const _resetProfilePasswords = () => ({
     type: RESET_PROFILE_PASSWORDS
 });
 
-export const resetProfileError = () => ({
+const _resetProfileError = () => ({
     type: RESET_PROFILE_ERROR
 });
 
@@ -64,9 +64,9 @@ export const updateProfile = ({id, email, oldPassword, password}) =>
             password
         })
             .then((response) => {
-                dispatch(setUser(response.data.user));
-                dispatch(resetProfileError());
-                dispatch(resetProfilePasswords());
+                dispatch(updateStoreWithUser());
+                dispatch(_resetProfileError());
+                dispatch(_resetProfilePasswords());
             })
             .catch((err) => {
                 // TODO: 
