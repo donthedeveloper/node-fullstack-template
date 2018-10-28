@@ -71,7 +71,6 @@ UserSchema.statics.authenticate = async function({email, id, password}) {
 
 UserSchema.pre('validate', async function(next) {
     const {password} = this;
-    // console.log(chalk.yellow('password:', password));
     const oldPassword = this.old_password;
     const token = this.resetPassword.token;
         if (!this.isNew && password && !oldPassword && !token) {

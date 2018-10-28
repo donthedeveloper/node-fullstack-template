@@ -1,10 +1,14 @@
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Redirect} from 'react-router-dom';
-import {changeResetFormPassword, setResetFormConfirmPassword, setResetFormPassword} from './ResetForm.actions';
+import {Link} from 'react-router-dom';
+import {changeResetFormPassword, pushResetFormError, setResetFormConfirmPassword, setResetFormPassword, verifyToken} from './ResetForm.actions';
 
 class ResetForm extends Component {
+
+    componentDidMount() {
+        this.props.verifyToken(this.props.match.params.token);
+    }
 
     handleConfirmPasswordChange = (e) => {
         this.props.setResetFormConfirmPassword(e.target.value);
@@ -16,27 +20,38 @@ class ResetForm extends Component {
     
     handleSubmit = (e) => {
         e.preventDefault();
+
+        if (this.props.password !== this.props.confirmPassword) {
+            return this.props.pushResetFormError({
+                field: 'old_password',
+                message: 'Passwords must match.'
+            });
+        }
+
         this.props.changeResetFormPassword(this.props.password, this.props.match.params.token);
     }
 
+    generateInvalidTokenMessage() {
+        return <p>This is an invalid token. Please go back to the <Link to='/forgot'>forgot password page</Link> and request a new token.</p>;
+    }
+
     render() {
-        // todo: error message when there is no token, instead?
-        // if (!this.props.match.params.token) {
-        //     return <Redirect to='/forgot' />;
-        // }
+        if (this.props.error.messages.includes('Invalid or expired token.')) {
+            return this.generateInvalidTokenMessage();
+        }
 
         return (
             <form onSubmit={this.handleSubmit}>
-                {/* <ul>
+                <ul>
                     {this.props.error.messages.map((message, i) =>
                         <li key={i}>{message}</li>
                     )}
-                </ul> */}
+                </ul>
                 <label htmlFor='password'>Password:</label>
                 <input
                     id='password'
                     onChange={this.handlePasswordChange}
-                    required={Boolean(this.props.confirmPassword)}
+                    required
                     type='password'
                     value={this.props.password}
                 />
@@ -44,7 +59,7 @@ class ResetForm extends Component {
                 <input
                     id='confirmPassword'
                     onChange={this.handleConfirmPasswordChange}
-                    required={Boolean(this.props.password)}
+                    required
                     type='password'
                     value={this.props.confirmPassword}
                 />
@@ -64,8 +79,10 @@ ResetForm.propTypes = {
     confirmPassword: PropTypes.string,
     // profile action creators
     changeResetFormPassword: PropTypes.func.isRequired,
+    pushResetFormError: PropTypes.func.isRequired,
     setResetFormConfirmPassword: PropTypes.func.isRequired,
-    setResetFormPassword: PropTypes.func.isRequired
+    setResetFormPassword: PropTypes.func.isRequired,
+    verifyToken: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) => ({
@@ -74,4 +91,7 @@ const mapStateToProps = (state) => ({
     password: state.resetForm.password
 });
 
-export default connect(mapStateToProps, {changeResetFormPassword, setResetFormConfirmPassword, setResetFormPassword})(ResetForm);
+export default connect(
+    mapStateToProps,
+    {changeResetFormPassword, pushResetFormError, setResetFormConfirmPassword, setResetFormPassword, verifyToken})
+(ResetForm);

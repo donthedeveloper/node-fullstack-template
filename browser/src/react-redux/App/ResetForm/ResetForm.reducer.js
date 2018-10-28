@@ -1,3 +1,4 @@
+const PUSH_RESET_FORM_ERROR = 'PUSH_RESET_FORM_ERROR';
 const RESET_RESET_FORM = 'RESET_RESET_FORM';
 const SET_RESET_FORM_ERROR = 'SET_RESET_FORM_ERROR';
 const SET_RESET_FORM_CONFIRM_PASSWORD = 'SET_RESET_FORM_CONFIRM_PASSWORD';
@@ -18,6 +19,15 @@ export default (state=initialState, action) => {
     switch (action.type) {
         case RESET_RESET_FORM:
             return initialState;
+        case PUSH_RESET_FORM_ERROR:
+            /** todo: SET_RESET_FORM_ERROR actually does set it,
+             * maybe we just actually make this ADD to the error state
+            */
+            const {field, message} = action.error;
+            newState.error = Object.assign({}, initialState.error);
+            newState.error.fields = [field];
+            newState.error.messages = [message];
+            break;
         case SET_RESET_FORM_ERROR:
             const actionErrors = action.error.errors;
             const actionMessage = action.error.message;

@@ -38,14 +38,15 @@ export default (state=initialState, action) => {
         case SET_PROFILE_EMAIL:
             newState.email = action.email;
             break;
-        // todo: should this be set?
         case PUSH_PROFILE_ERROR:
+            /** todo: SET_RESET_FORM_ERROR actually does set it,
+             * maybe we just actually make this ADD to the error state
+            */
             const {field, message} = action.error;
             newState.error = Object.assign({}, initialState.error);
             newState.error.fields = [field];
             newState.error.messages = [message];
             break;
-        // todo: should this be push?
         case SET_PROFILE_ERROR:
             const actionErrors = action.error.errors;
             const actionMessage = action.error.message;
