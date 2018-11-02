@@ -15,6 +15,7 @@
     "mongoose-unique-validator": "^2.0.1",
     "mongoose-validator": "^2.1.0",
     "morgan": "^1.9.0",
+    "nodemailer": "^4.6.8",
     "nunjucks": "^3.0.1",
     "nunjucks-autoescape": "^1.0.1",
     "prop-types": "^15.6.2",

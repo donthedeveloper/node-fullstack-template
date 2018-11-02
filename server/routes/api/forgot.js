@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const express = require('express'),
     router = express.Router();
+const nodemailer = require('nodemailer');
 const User = require('../../models/user');
 
 router.post('/', async (req, res, next) => {
@@ -17,12 +18,29 @@ router.post('/', async (req, res, next) => {
                 }
                 try {
                     await user.save();
+
+                    // Nodemailer
+                    const transporter = nodemailer.createTransport({
+                        service: 'gmail',
+                        auth: {
+                            user: process.env.PASSWORD_RESET_AUTH_EMAIL,
+                            pass: process.env.PASSWORD_RESET_AUTH_PASSWORD
+                        }
+                    });
+
+                    transporter.sendMail({
+                        from: process.env.PASSWORD_RESET_AUTH_EMAIL,
+                        to: user.email,
+                        subject: 'Forgot Password Request',
+                        html: `<p>You are receiving this because you, or someone else, requested a password reset. Click <a href="http://localhost:${process.env.PORT}/reset/${token}">here</a> to finish resetting your password.</p>`
+                    }, (err, info) => {
+                        console.error(err);
+                    })
+
                     res.sendStatus(200);
                 } catch(e) {
                     console.error(e);
                 }
-
-                // TODO: Nodemailer!
             });
         } else {
             res.sendStatus(200);
