@@ -1,14 +1,19 @@
+const chalk = require('chalk');
 const express = require('express');
 const router = express.Router();
 
-const userApi = require('./user');
+const forgotApi = require('./forgot');
 const loginApi = require('./login');
 const logoutApi = require('./logout');
+const resetApi = require('./reset');
+const userApi = require('./user');
 const whoamiApi = require('./whoami');
 
-router.use('/user', userApi);
+router.use('/forgot', forgotApi);
 router.use('/login', loginApi);
 router.use('/logout', logoutApi);
+router.use('/reset', resetApi);
+router.use('/user', userApi);
 router.use('/whoami', whoamiApi);
 
 // API Catchall Error Handlers

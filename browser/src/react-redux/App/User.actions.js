@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const SET_USER = 'SET_USER';
 
-export const setUser = (user) => ({
+const _setUser = (user) => ({
     type: SET_USER,
     user
 });
@@ -11,7 +11,8 @@ export const updateStoreWithUser = () =>
     dispatch => 
         axios.get('/api/whoami')
             .then((res) => {
-                dispatch(setUser(res.data.user));
+                // todo: create option for callback and call it here
+                dispatch(_setUser(res.data.user));
             })
             .catch((err) => {
                 console.error(err);
@@ -20,7 +21,7 @@ export const updateStoreWithUser = () =>
 export const logout = () =>
     dispatch =>
         axios.get('/api/logout')
-            .then((res) => {
+            .then(() => {
                 dispatch(updateStoreWithUser());
             })
             .catch((err) => {

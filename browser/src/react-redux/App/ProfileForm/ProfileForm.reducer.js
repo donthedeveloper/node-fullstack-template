@@ -1,4 +1,5 @@
 // TODO: share constants file with actions
+// todo: why is this called push instead of set?
 const PUSH_PROFILE_ERROR = 'PUSH_PROFILE_ERROR';
 const RESET_PROFILE_ERROR = 'RESET_PROFILE_ERROR';
 const RESET_PROFILE_PASSWORDS = 'RESET_PROFILE_PASSWORDS';
@@ -38,6 +39,9 @@ export default (state=initialState, action) => {
             newState.email = action.email;
             break;
         case PUSH_PROFILE_ERROR:
+            /** todo: SET_RESET_FORM_ERROR actually does set it,
+             * maybe we just actually make this ADD to the error state
+            */
             const {field, message} = action.error;
             newState.error = Object.assign({}, initialState.error);
             newState.error.fields = [field];

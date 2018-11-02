@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import {Link} from 'react-router-dom';
 import {authenticate, resetLoginState, setLoginEmail, setLoginPassword} from './LoginForm.actions';
 
 class LoginForm extends Component {
@@ -24,30 +25,33 @@ class LoginForm extends Component {
 
     render() {
         return (
-            <form onSubmit={this.handleSubmit}>
-                <ul>
-                    {this.props.error.messages.map((message, i) =>
-                        <li key={i}>{message}</li>
-                    )}
-                </ul>
-                <label htmlFor='email'>Email:</label>
-                <input
-                    id='email'
-                    onChange={this.handleOnEmailChange}
-                    required
-                    type='email'
-                    value={this.props.email}
-                />
-                <label htmlFor='password'>Password:</label>
-                <input
-                    id='password'
-                    onChange={this.handleOnPasswordChange}
-                    required
-                    type='password'
-                    value={this.props.password}
-                />
-                <input type='submit' value='Login' />
-            </form>
+            <div>
+                <form onSubmit={this.handleSubmit}>
+                    <ul>
+                        {this.props.error.messages.map((message, i) =>
+                            <li key={i}>{message}</li>
+                        )}
+                    </ul>
+                    <label htmlFor='email'>Email:</label>
+                    <input
+                        id='email'
+                        onChange={this.handleOnEmailChange}
+                        required
+                        type='email'
+                        value={this.props.email}
+                    />
+                    <label htmlFor='password'>Password:</label>
+                    <input
+                        id='password'
+                        onChange={this.handleOnPasswordChange}
+                        required
+                        type='password'
+                        value={this.props.password}
+                    />
+                    <input type='submit' value='Login' />
+                </form>
+                <Link to='/forgot'>Forgot Password</Link>
+            </div>
         );
     }
 }

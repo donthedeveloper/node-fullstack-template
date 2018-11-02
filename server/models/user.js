@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const chalk = require('chalk');
 const mongoose = require('mongoose');
 const validate = require('mongoose-validator');
 const uniqueValidator = require('mongoose-unique-validator');
@@ -23,6 +24,14 @@ const UserSchema = new mongoose.Schema({
             'You must provide a password.'
         ],
         type: String
+    },
+    resetPassword: {
+        expiration: {
+            type: Date
+        },
+        token: {
+            type: String
+        }
     }
 });
 
@@ -63,7 +72,8 @@ UserSchema.statics.authenticate = async function({email, id, password}) {
 UserSchema.pre('validate', async function(next) {
     const {password} = this;
     const oldPassword = this.old_password;
-        if (password && !this.isNew && !oldPassword) {
+    const token = this.resetPassword.token;
+        if (!this.isNew && password && !oldPassword && !token) {
             this.invalidate('old_password', 'Old password required in order to change password.');
         }
 
@@ -80,7 +90,17 @@ UserSchema.pre('validate', async function(next) {
             } catch(e) {
                 this.invalidate('old_password', 'Invalid old password.');
             }
+            next();
         }
+
+        // if (!this.isNew && password && !token && !oldPassword) {
+        //     this.invalidate('resetPassword.token', 'Token required in order to change password');
+        // }
+
+        // TODO: possibly check this in the route, because we need to see the token in the route
+        // if (!password && token) {
+        //     this.invalidate('password', 'If a token is provided, it is assumed that you are trying to change your password. Please provide a new password');
+        // }
 
     next();
 });
