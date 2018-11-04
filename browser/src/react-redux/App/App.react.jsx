@@ -54,16 +54,20 @@ class App extends React.Component {
                 </ul>
                 <Switch>
                     <Route exact path='/' component={null} />
-                    <UnauthenticatedRoute
-                        isAllowed={!user}
-                        path='/login'
-                        component={LoginForm}
-                    />
-                    <UnauthenticatedRoute
-                        isAllowed={!user}
-                        path='/signup'
-                        component={SignupForm}
-                    />
+                    <div className='authentication'>
+                        {/* <div className='authentication__container'> */}
+                            <UnauthenticatedRoute
+                                isAllowed={!user}
+                                path='/login'
+                                component={LoginForm}
+                            />
+                            <UnauthenticatedRoute
+                                isAllowed={!user}
+                                path='/signup'
+                                component={SignupForm}
+                            />
+                        {/* </div> */}
+                    </div>
                     <UnauthenticatedRoute
                         isAllowed={!user}
                         path='/forgot'
