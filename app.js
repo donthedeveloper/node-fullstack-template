@@ -5,7 +5,6 @@ const express = require('express'),
   app = express();
 const mongoose = require('mongoose');
 const morgan = require('morgan');
-const nunjucks = require('nunjucks');
 const session = require('express-session'),
   MongoStore = require('connect-mongo')(session);
 
@@ -31,20 +30,7 @@ app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-app.engine('html', nunjucks.render);
-app.set('view engine', 'html');
-
-const nunjucksConfigure = nunjucks.configure('server/templates', {
-  noCache: true, 
-  autoescape: true, 
-  express: app
-});
-
-// and then include these two lines of code to add the extension:
-const AutoEscapeExtension = require("nunjucks-autoescape")(nunjucks);
-nunjucksConfigure.addExtension('AutoEscapeExtension', new AutoEscapeExtension(nunjucksConfigure));
-
-app.use(express.static('browser/public'));
+app.use(express.static('browser/assets'));
 
 const router = require('./server/routes');
 app.use('/', router);
