@@ -25,32 +25,49 @@ class LoginForm extends Component {
 
     render() {
         return (
-            <div>
-                <form onSubmit={this.handleSubmit}>
-                    <ul>
-                        {this.props.error.messages.map((message, i) =>
-                            <li key={i}>{message}</li>
-                        )}
-                    </ul>
-                    <label htmlFor='email'>Email:</label>
+            <div className='login'>
+                <form
+                    className='login-form'
+                    onSubmit={this.handleSubmit}
+                >
+                    {this.props.error.messages.length > 0 &&
+                        <ul>
+                            {this.props.error.messages.map((message, i) =>
+                                <li key={i}>{message}</li>
+                            )}
+                        </ul>
+                    }
+                    <label className='login-form__label' htmlFor='email'>
+                        Email:
+                    </label>
                     <input
+                        className='login-form__input'
                         id='email'
                         onChange={this.handleOnEmailChange}
+                        placeholder='Email'
                         required
                         type='email'
                         value={this.props.email}
                     />
-                    <label htmlFor='password'>Password:</label>
+                    <label className='login-form__label' htmlFor='password'>
+                        Password:
+                    </label>
                     <input
+                        className='login-form__input'
                         id='password'
                         onChange={this.handleOnPasswordChange}
+                        placeholder='Password'
                         required
                         type='password'
                         value={this.props.password}
                     />
-                    <input type='submit' value='Login' />
+                    <input
+                        className='login-form__submit'
+                        type='submit'
+                        value='Log in'
+                    />
                 </form>
-                <Link to='/forgot'>Forgot Password</Link>
+                <Link className='login__link' to='/forgot'>Forgot Password</Link>
             </div>
         );
     }
