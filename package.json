@@ -51,7 +51,7 @@
     "webpack-dev-server": "^3.2.1"
   },
   "scripts": {
-    "dev": "npm install & npm run start-dev-backend & npm run start-dev-frontend",
+    "dev": "npm install && npm run start-dev-backend && npm run start-dev-frontend",
     "start": "node app.js",
     "start-dev-backend": "nodemon server.js --ignore ./browser",
     "start-dev-frontend": "webpack-dev-server --open",
