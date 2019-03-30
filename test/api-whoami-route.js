@@ -5,26 +5,21 @@ const expect = chai.expect;
 chai.use(chaiHttp);
 const User = require('../server/models/user');
 
-describe('\'/api/logout\' Route', function() {
+describe('\'/api/whoami\' Route', function() {
     const email = 'thisisnotarealemail@gmail.com';
     const password = 'rightpassword';
     const agent = chai.request.agent(app);
 
-    beforeEach(function(done) {
-        User.create({email, password}).then(() => {
-            agent.post('/api/login')
-                .type('form')
-                .send({
-                    email: 'thisisnotarealemail@gmail.com',
-                    password: 'rightpassword'
-                })
-                .then((res) => {
-                    done();
-                })
-                .catch((err) => {
-                    done(err);
-                });
-        });
+    beforeEach(function() {
+        return User.create({email, password})
+            .then(() => {
+                return agent.post('/api/login')
+                    .type('form')
+                    .send({
+                        email: 'thisisnotarealemail@gmail.com',
+                        password: 'rightpassword'
+                    })
+            });
     });
 
     describe('GET Request', function() {
@@ -33,18 +28,18 @@ describe('\'/api/logout\' Route', function() {
             User.findOne({email})
             .then(({_id}) => {
                 agent.get('/api/whoami')
-                .then((res) => {
-                    expect(res).to.have.status(status);
-                    expect(res.body.user).to.be.an('object');
-                    expect(res.body.user).to.include({
-                        email,
-                        _id: _id.toString()
+                    .then((res) => {
+                        expect(res).to.have.status(status);
+                        expect(res.body.user).to.be.an('object');
+                        expect(res.body.user).to.include({
+                            email,
+                            _id: _id.toString()
+                        });
+                        done();
+                    })
+                    .catch((err) => {
+                        done(err);
                     });
-                    done();
-                })
-                .catch((err) => {
-                    done(err);
-                });
             })
             .catch((err) => {
                 done(err);

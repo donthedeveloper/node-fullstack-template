@@ -1,6 +1,5 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const mongoose = require('mongoose');
 const app = require('../app');
 const expect = chai.expect;
 chai.use(chaiHttp);
@@ -22,7 +21,7 @@ describe('\'/api/user\' Route', function() {
                 chai.request(app)
                     .post('/api/user')
                     .type('form')
-                    .send({})
+                    .send()
                     .end(function(err, res) {
                         expect(res).to.have.status(status);
                         expect(res.body.error.name).to.equal(validationErrorName);
@@ -129,7 +128,7 @@ describe('\'/api/user\' Route', function() {
                 chai.request(app)
                     .patch(`/api/user/thisiddoesntexist`)
                     .type('form')
-                    .send({})
+                    .send()
                     .end(function(err, res) {
                         expect(res).to.have.status(status);
                         expect(res.body.error).to.have.property('name').eql(validationErrorName);
@@ -150,7 +149,7 @@ describe('\'/api/user\' Route', function() {
                                 chai.request(app)
                                     .patch(`/api/user/${user._id}`)
                                     .type('form')
-                                    .send({})
+                                    .send()
                                     .end(function(err, res) {
                                         expect(res).to.have.status(status);
                                         expect(res.body.error.message).to.equal(errorMessage);
@@ -165,20 +164,6 @@ describe('\'/api/user\' Route', function() {
                         done(err);
                     });
             });
-        })
-
-        describe('made with an non-existing, valid user id', function() {
-            const status = 404;
-            it(`responds with status ${status}`, function(done) {
-                chai.request(app)
-                    .patch(`/api/user/${mongoose.Types.ObjectId()}`)
-                    .type('form')
-                    .send({})
-                    .end(function(err, res) {
-                        expect(res).to.have.status(status);
-                        done();
-                    });
-            });
         });
 
         describe('made with an empty payload', function() {
@@ -189,7 +174,7 @@ describe('\'/api/user\' Route', function() {
                         chai.request(app)
                         .patch(`/api/user/${user._id}`)
                         .type('form')
-                        .send({})
+                        .send()
                         .end(function(err, res) {
                             expect(res).to.have.status(status);
                             expect(res.body).to.have.property('user');
@@ -237,7 +222,7 @@ describe('\'/api/user\' Route', function() {
         //         chai.request(app)
         //         .patch(`/api/user/${user._id}`)
         //         .type('form')
-        //         .send({})
+        //         .send()
         //         .then((res) => {
         //             expect(res).to.have.status(status);
         //             expect(res.body).to.have.property('user');
@@ -249,7 +234,7 @@ describe('\'/api/user\' Route', function() {
         //     });
         // });
 
-        describe('made with a different email address to update', function() {
+        describe('made with a new email address', function() {
             const status = 200;
             it(`responds with status ${status} and includes user.email with value of ${emailToChangeTo}`, function(done) {
                 User.findOne({email: user1.email})
@@ -272,7 +257,7 @@ describe('\'/api/user\' Route', function() {
             });
         });
 
-        describe('made with a duplicate (unique) email address to update', function() {
+        describe('made with a duplicate email address to update', function() {
             const status = 400;
             it(`responds with status ${status} and includes message '${emailDuplicateErrorMessage}'`, function(done) {
                 User.findOne({email: user1.email})
@@ -283,8 +268,8 @@ describe('\'/api/user\' Route', function() {
                             .send({email: user2.email})
                             .end(function(err, res) {
                                 expect(res).to.have.status(status);
-                                expect(err.response.body.error.name).to.equal(validationErrorName);
-                                expect(err.response.body.error.errors.email.message).to.equal(emailDuplicateErrorMessage);
+                                expect(res.body.error.name).to.equal(validationErrorName);
+                                expect(res.body.error.errors.email.message).to.equal(emailDuplicateErrorMessage);
                                 done();
                             });
                     })
@@ -309,8 +294,8 @@ describe('\'/api/user\' Route', function() {
                             })
                             .end(function(err, res) {
                                 expect(res).to.have.status(status);
-                                expect(err.response.body.error.name).to.equal(validationErrorName);
-                                expect(err.response.body.error.errors.old_password.message).to.equal(errorMessage);
+                                expect(res.body.error.name).to.equal(validationErrorName);
+                                expect(res.body.error.errors.old_password.message).to.equal(errorMessage);
                                 done();
                             });
                     })
@@ -335,8 +320,8 @@ describe('\'/api/user\' Route', function() {
                             })
                             .end(function(err, res) {
                                 expect(res).to.have.status(status);
-                                expect(err.response.body.error.name).to.equal(validationErrorName);
-                                expect(err.response.body.error.errors.password.message).to.equal(errorMessage);
+                                expect(res.body.error.name).to.equal(validationErrorName);
+                                expect(res.body.error.errors.password.message).to.equal(errorMessage);
                                 done();
                             });
                     })
@@ -362,8 +347,8 @@ describe('\'/api/user\' Route', function() {
                             })
                             .end(function(err, res) {
                                 expect(res).to.have.status(status);
-                                expect(err.response.body.error.name).to.equal(validationErrorName);
-                                expect(err.response.body.error.errors.old_password.message).to.equal(errorMessage);
+                                expect(res.body.error.name).to.equal(validationErrorName);
+                                expect(res.body.error.errors.old_password.message).to.equal(errorMessage);
                                 done();
                             });
                     })

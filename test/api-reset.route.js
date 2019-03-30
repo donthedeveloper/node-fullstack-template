@@ -158,8 +158,8 @@ describe('\'/api/reset/:token\' Route', () => {
                                     .type('form')
                                     .end((err, res) => {
                                         expect(res).to.have.status(status);
-                                        expect(err.response.body.error.name).to.equal(validationErrorName);
-                                        expect(err.response.body.error.errors.password.message).to.equal(passwordEmptyErrorMessage);
+                                        expect(res.body.error.name).to.equal(validationErrorName);
+                                        expect(res.body.error.errors.password.message).to.equal(passwordEmptyErrorMessage);
                                         done();
                                     });
                             })

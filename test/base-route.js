@@ -6,7 +6,15 @@ chai.use(chaiHttp);
 
 // TODO: re-run tests whenever a code change happens in the app
 // TODO: test any route outside of root and api and make sure it serves a 200 (index html with react)
+
 describe('\'/\' Route', function() {
+    beforeEach(function() {
+        // webpack-dev-server doesn't build index
+        if (process.env.NODE_ENV === 'DEVELOPMENT') {
+            this.skip();
+        }
+    });
+
     describe('GET Request', function() {
         const status = 200;
         it(`responds with status ${status}`, function(done) {
