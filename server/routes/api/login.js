@@ -5,6 +5,9 @@ const User = require('../../models/user');
 router.post('/', (req, res, next) => {
     const {email, password} = req.body;
 
+    // todo: we should probably validate empty email and password and send validation error back
+    // if we do this, remember to update login form with field errors
+
     return User.authenticate({email, password})
         .then((user) => {
             req.session.userId = user._id;

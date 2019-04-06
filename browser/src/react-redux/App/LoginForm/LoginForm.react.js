@@ -1,66 +1,77 @@
-import PropTypes from 'prop-types';
+import axios from 'axios';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
-import {authenticate, resetLoginState, setLoginEmail, setLoginPassword} from './LoginForm.actions';
+import {updateStoreWithUser} from '../User.actions';
 
 class LoginForm extends Component {
 
-    componentWillUnmount = () => {
-        this.props.resetLoginState();
-    }
+    state = {
+        email: '',
+        genericError: '',
+        password: ''
+    };
+
+    handleInputChange = ({target: {name, value}}) => {
+        this.setState({
+            [name]: value,
+        });
+    };
 
     handleSubmit = (e) => {
         e.preventDefault();
-        this.props.authenticate(this.props.email, this.props.password);
-    };
-
-    handleOnEmailChange = (e) => {
-        this.props.setLoginEmail(e.target.value);
-    };
-
-    handleOnPasswordChange = (e) => {
-        this.props.setLoginPassword(e.target.value);
+        const {email, password} = this.state;
+        axios.post('/api/login', {email, password})
+            .then((user) => {
+                this.props.updateStoreWithUser(user);
+            })
+            .catch((error) => {
+                this.setState({
+                    genericError: error.response.data.error.message
+                });
+            });
     };
 
     render() {
+        const {genericError} = this.state;
         return (
             <div className='login'>
                 <form
                     className='login-form'
                     onSubmit={this.handleSubmit}
                 >
-                    {this.props.error.messages.length > 0 &&
-                        <ul>
-                            {this.props.error.messages.map((message, i) =>
-                                <li key={i}>{message}</li>
-                            )}
-                        </ul>
+                    {genericError &&
+                        <p>{genericError}</p>
                     }
+
                     <label className='login-form__label' htmlFor='email'>
                         Email:
                     </label>
                     <input
                         className='login-form__input'
                         id='email'
-                        onChange={this.handleOnEmailChange}
+                        name='email'
+                        onChange={this.handleInputChange}
                         placeholder='Email'
                         required
                         type='email'
                         value={this.props.email}
                     />
+
                     <label className='login-form__label' htmlFor='password'>
                         Password:
                     </label>
                     <input
                         className='login-form__input'
                         id='password'
-                        onChange={this.handleOnPasswordChange}
+                        name='password'
+                        onChange={this.handleInputChange}
                         placeholder='Password'
                         required
                         type='password'
                         value={this.props.password}
                     />
+
                     <input
                         className='login-form__submit'
                         type='submit'
@@ -73,31 +84,4 @@ class LoginForm extends Component {
     }
 }
 
-LoginForm.propTypes = {
-    // login state
-    email: PropTypes.string,
-    error: PropTypes.shape({
-      fields: PropTypes.array.isRequired,
-      messages: PropTypes.array.isRequired 
-    }).isRequired,
-    password: PropTypes.string,
-    // user state
-    user: PropTypes.shape({
-        _id: PropTypes.string,
-        email: PropTypes.string,
-    }),
-    // login action creators
-    authenticate: PropTypes.func.isRequired,
-    resetLoginState: PropTypes.func.isRequired,
-    setLoginEmail: PropTypes.func.isRequired,
-    setLoginPassword: PropTypes.func.isRequired,
-};
-
-const mapStateToProps = (state) => ({
-    email: state.loginForm.email,
-    error: state.loginForm.error,
-    password: state.loginForm.password,
-    user: state.user
-});
-
-export default connect(mapStateToProps, {authenticate, resetLoginState, setLoginEmail, setLoginPassword})(LoginForm);
+export default connect(null, {updateStoreWithUser})(LoginForm);

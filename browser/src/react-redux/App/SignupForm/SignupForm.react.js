@@ -1,113 +1,142 @@
+import axios from 'axios';
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {resetSignupState, sendSignupData, setSignupConfirmPassword, setSignupEmail, setSignupError, setSignupPassword} from './SignupForm.actions';
+import {updateStoreWithUser} from '../User.actions';
 
 class SignupForm extends Component {
 
-    componentWillUnmount = () => {
-        this.props.resetSignupState();
-    }
-
-    handleConfirmPasswordChange = (e) => {
-        this.props.setSignupConfirmPassword(e.target.value);
-    }
-
-    handleEmailChange = (e) => {
-        this.props.setSignupEmail(e.target.value);
+    static propTypes = {
+        user: PropTypes.shape({
+            _id: PropTypes.string,
+            email: PropTypes.string
+        })
     };
 
-    handlePasswordChange = (e) => {
-        this.props.setSignupPassword(e.target.value);
+    state = {
+        confirmPassword: '',
+        email: '',
+        fieldErrors: {},
+        genericError: '',
+        password: '',
+    };
+
+    createUser({email, password}) {
+        axios.post('/api/user', {email, password})
+            .then((user) => {
+                this.props.updateStoreWithUser(user);
+            })
+            .catch((error) => {
+                const errorBody = error.response.data.error;
+                if (error.response.status === 400) {
+                    const fieldErrors = errorBody.errors;
+                    if (fieldErrors) {
+                        const fieldErrorsState = Object.entries(fieldErrors).reduce((fieldErrorsState, [fieldName, fieldError]) => {
+                            fieldErrorsState[fieldName] = fieldError.message;
+                            return fieldErrorsState;
+                        }, {});
+                        this.updateFieldErrors(fieldErrorsState);
+                    }
+                }
+                this.setState({
+                    genericError: errorBody.message
+                });
+            })
+    }
+
+    handleInputChange = ({target: {name, value}}) => {
+        this.setState({
+            [name]: value,
+        });
+        this.updateFieldErrors({
+            [name]: ''
+        });
     };
 
     handleSubmit = (e) => {
         e.preventDefault();
 
-        const password = this.props.password;
-        if (password && password !== this.props.confirmPassword) {
-            // TODO: make this utility function for creating errors
-            this.props.setSignupError({
-                message: 'Passwords must match.'
-            });
-            return;
+        const {confirmPassword, email, password} = this.state;
+        const passwordsMatch = password === confirmPassword;
+        const fieldErrors = {};
+        if (password && !passwordsMatch) {
+            this.updateFieldErrors({
+                confirmPassword: 'Passwords must match'
+            })
+        } else {
+            this.setState({fieldErrors}, () => this.createUser({email, password}));
         }
+    }
 
-        this.props.sendSignupData(this.props.email, this.props.password);
+    updateFieldErrors(fieldErrors) {
+        this.setState({
+            fieldErrors: {
+                ...this.state.fieldErrors,
+                ...fieldErrors
+            }
+        })
     }
 
     render() {
+        const {confirmPassword, email, fieldErrors, genericError, password} = this.state;
+        const confirmPasswordError = fieldErrors.confirmPassword;
+        const emailError = fieldErrors.email;
+        const passwordError = fieldErrors.password;
+
         return (
             <form onSubmit={this.handleSubmit}>
-                <ul>
-                    {this.props.error.messages.map((message, i) =>
-                        <li key={i}>{message}</li>
-                    )}
-                </ul>
+
+                {genericError &&
+                    <p>{genericError}</p>
+                }
+
                 <label htmlFor='email'>Email:</label>
                 <input
                     id='email'
-                    onChange={this.handleEmailChange}
+                    name='email'
+                    onChange={this.handleInputChange}
                     required
                     type='email'
-                    value={this.props.email}
+                    value={email}
                 />
+                {emailError &&
+                    <p>{emailError}</p>
+                }
+
                 <label htmlFor='password'>Password:</label>
                 <input
                     id='password'
-                    onChange={this.handlePasswordChange}
+                    name='password'
+                    onChange={this.handleInputChange}
                     required
                     type='password'
-                    value={this.props.password}
+                    value={password}
                 />
+                {passwordError &&
+                    <p>{passwordError}</p>
+                }
+
                 <label htmlFor='confirmPassword'>Confirm Password</label>
                 <input
                     id='confirmPassword'
-                    onChange={this.handleConfirmPasswordChange}
+                    name='confirmPassword'
+                    onChange={this.handleInputChange}
                     required
                     type='password'
-                    value={this.props.confirmPassword}
+                    value={confirmPassword}
                 />
+                {confirmPasswordError &&
+                    <p>{confirmPasswordError}</p>
+                }
+
                 <input type='submit' value='Register' />
             </form>
         );
     }
 }
 
-SignupForm.propTypes = {
-    // signup state
-    confirmPassword: PropTypes.string,
-    email: PropTypes.string,
-    error: PropTypes.shape({
-        fields: PropTypes.array.isRequired,
-        messages: PropTypes.array.isRequired 
-      }).isRequired,
-    password: PropTypes.string,
-    // user state
-    user: PropTypes.shape({
-        _id: PropTypes.string,
-        email: PropTypes.string
-    }),
-    // signup action creators
-    resetSignupState: PropTypes.func.isRequired,
-    sendSignupData: PropTypes.func.isRequired,
-    setSignupConfirmPassword: PropTypes.func.isRequired,
-    setSignupEmail: PropTypes.func.isRequired,
-    setSignupError: PropTypes.func.isRequired,
-    setSignupPassword: PropTypes.func.isRequired,
-};
-
 const mapStateToProps = (state) => ({
-    // signup state
-    confirmPassword: state.signupForm.confirmPassword,
-    email: state.signupForm.email,
-    error: state.signupForm.error,
-    password: state.signupForm.password,
-    // user state
     user: state.user
 });
 
-export default connect(
-    mapStateToProps,
-    {resetSignupState, sendSignupData, setSignupConfirmPassword, setSignupEmail, setSignupError, setSignupPassword}
-)(SignupForm);
+export default connect(mapStateToProps, {updateStoreWithUser})(SignupForm);

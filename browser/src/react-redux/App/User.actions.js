@@ -7,16 +7,15 @@ const _setUser = (user) => ({
     user
 });
 
-export const updateStoreWithUser = () =>
-    dispatch => 
-        axios.get('/api/whoami')
-            .then((res) => {
-                // todo: create option for callback and call it here
-                dispatch(_setUser(res.data.user));
-            })
-            .catch((err) => {
-                console.error(err);
-            });
+export const updateStoreWithUser = (user) =>
+    dispatch => {
+        if (user) {
+            return dispatch(_setUser(user));
+        }
+        return axios.get('/api/whoami')
+            .then((response) => dispatch(_setUser(response.data.user)))
+            .catch((error) => console.error(error))
+    }
 
 export const logout = () =>
     dispatch =>
