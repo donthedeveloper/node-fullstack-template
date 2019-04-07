@@ -18,8 +18,12 @@ class LoginForm extends Component {
         });
     };
 
-    handleSubmit = (e) => {
+    handleSubmit(e) {
         e.preventDefault();
+        this.login();
+    };
+
+    login = () => {
         const {email, password} = this.state;
         axios.post('/api/login', {email, password})
             .then((user) => {

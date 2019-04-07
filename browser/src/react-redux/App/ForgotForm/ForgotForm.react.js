@@ -1,31 +1,51 @@
-import PropTypes from 'prop-types';
+import axios from 'axios';
 import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
-import {connect} from 'react-redux';
-import {requestToken, resetForgotForm, setForgotFormEmail} from './ForgotForm.actions';
 
 class ForgotForm extends Component {
 
-    componentWillUnmount() {
-        this.props.resetForgotForm();
+    state = {
+        email: '',
+        emailSent: false
+    };
+
+    requestToken() {
+        axios.post('/api/forgot', {email: this.state.email})
+            .then(() => {
+                this.setState({
+                    email: '',
+                    emailSent: true
+                });
+            });
+            // todo: handle blank/invalid email, needs backend work
+            // todo: handle generic form error
     }
 
-    handleEmailChange = (e) => {
-        this.props.setForgotFormEmail(e.target.value);
-    }
+    handleInputChange = ({target: {name, value}}) => {
+        this.setState({
+            [name]: value,
+        });
+    };
 
     handleSubmit = (e) => {
         e.preventDefault();
-        this.props.requestToken(this.props.email);
+        this.requestToken();
     }
 
     generateForm() {
         return (
             <form onSubmit={this.handleSubmit}>
+                {/* todo: show generic form error */}
+                <label htmlFor='email'>Email:</label>
                 <input
-                    onChange={this.handleEmailChange}
+                    id='email'
+                    name='email'
+                    onChange={this.handleInputChange}
+                    required
                     type='email'
+                    value={this.state.email}
                 />
+                {/* todo: bring in field specific error message once backend work is complete */}
                 <input type='submit' />
             </form>
         );
@@ -42,10 +62,9 @@ class ForgotForm extends Component {
 
     render() {
         return (
-            // TODO: build out state check and reset component
             <div>
                 {
-                    this.props.emailSent
+                    this.state.emailSent
                         ? this.generateSuccessMessage()
                         : this.generateForm()
                 }
@@ -54,18 +73,4 @@ class ForgotForm extends Component {
     }
 }
 
-ForgotForm.propTypes = {
-    // forgotForm state
-    email: PropTypes.string,
-    // profile action creators
-    requestToken: PropTypes.func.isRequired,
-    resetForgotForm: PropTypes.func.isRequired,
-    setForgotFormEmail: PropTypes.func.isRequired,
-};
-
-const mapStateToProps = (state) => ({
-    email: state.forgotForm.email,
-    emailSent: state.forgotForm.emailSent
-});
-
-export default connect(mapStateToProps, {requestToken, resetForgotForm, setForgotFormEmail})(ForgotForm);
+export default ForgotForm;
