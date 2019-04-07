@@ -21,6 +21,7 @@ class SignupForm extends Component {
         password: '',
     };
 
+    // todo: dont need to pass email and password, just grab state
     createUser({email, password}) {
         axios.post('/api/user', {email, password})
             .then((user) => {

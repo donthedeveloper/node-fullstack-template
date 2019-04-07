@@ -18,7 +18,7 @@ class LoginForm extends Component {
         });
     };
 
-    handleSubmit(e) {
+    handleSubmit = (e) => {
         e.preventDefault();
         this.login();
     };

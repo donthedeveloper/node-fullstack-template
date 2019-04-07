@@ -43,7 +43,7 @@ describe('\'/api/reset/:token\' Route', () => {
                     .end((err, res) => {
                         User.findOne({email})
                             .then((user) => {
-                                user.resetPassword.expiration = Date.now(); // << culprit
+                                user.resetPassword.expiration = Date.now(); // << culprit (monkaS)
                                 user.save()
                                     .then((user) => {
                                         chai.request(app)

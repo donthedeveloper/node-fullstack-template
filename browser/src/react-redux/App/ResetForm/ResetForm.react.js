@@ -1,97 +1,140 @@
-import PropTypes from 'prop-types';
+import axios from 'axios';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
-import {changeResetFormPassword, pushResetFormError, setResetFormConfirmPassword, setResetFormPassword, verifyToken} from './ResetForm.actions';
+import {updateStoreWithUser} from '../User.actions';
 
 class ResetForm extends Component {
 
+    state = {
+        confirmPassword: '',
+        fieldErrors: {},
+        genericError: '',
+        password: '',
+        tokenIsValid: false
+    };
+
     componentDidMount() {
-        this.props.verifyToken(this.props.match.params.token);
+        this.verifyToken();
     }
 
-    handleConfirmPasswordChange = (e) => {
-        this.props.setResetFormConfirmPassword(e.target.value);
-    }
-
-    handlePasswordChange = (e) => {
-        this.props.setResetFormPassword(e.target.value);
-    }
-    
-    handleSubmit = (e) => {
-        e.preventDefault();
-
-        if (this.props.password !== this.props.confirmPassword) {
-            return this.props.pushResetFormError({
-                field: 'old_password',
-                message: 'Passwords must match.'
-            });
-        }
-
-        this.props.changeResetFormPassword(this.props.password, this.props.match.params.token);
+    changePassword() {
+        axios.post(`/api/reset/${this.props.match.params.token}`, {password: this.state.password})
+            .then(() => {
+                this.setState({
+                    confirmPassword: '',
+                    password: ''
+                });
+                this.props.updateStoreWithUser();
+            })
+            .catch((error) => {
+                const errorBody = error.response.data.error;
+                if (error.response.status === 400) {
+                    const fieldErrors = errorBody.errors;
+                    if (fieldErrors) {
+                        const fieldErrorsState = Object.entries(fieldErrors).reduce((fieldErrorsState, [fieldName, fieldError]) => {
+                            fieldErrorsState[fieldName] = fieldError.message;
+                            return fieldErrorsState;
+                        }, {});
+                        this.updateFieldErrors(fieldErrorsState);
+                    }
+                }
+                this.setState({
+                    genericError: errorBody.message
+                });
+            })
     }
 
     generateInvalidTokenMessage() {
-        return <p>This is an invalid token. Please go back to the <Link to='/forgot'>forgot password page</Link> and request a new token.</p>;
+        return (
+            <p>
+                This is an invalid token. Please go back to the <Link to='/forgot'>forgot password page</Link> and request a new token.
+            </p>
+        );
+    }
+
+    handleInputChange = ({target: {name, value}}) => {
+        this.setState({
+            [name]: value,
+        });
+        this.updateFieldErrors({
+            [name]: ''
+        });
+    };
+
+    handleSubmit = (e) => {
+        e.preventDefault();
+
+        const {confirmPassword, password} = this.state;
+        const passwordsMatch = password === confirmPassword;
+        const fieldErrors = {};
+        if (password && !passwordsMatch) {
+            this.updateFieldErrors({
+                confirmPassword: 'Passwords must match'
+            })
+        } else {
+            this.setState({fieldErrors}, () => this.changePassword());
+        }
+    }
+
+    updateFieldErrors(fieldErrors) {
+        this.setState({
+            fieldErrors: {
+                ...this.state.fieldErrors,
+                ...fieldErrors
+            }
+        })
+    }
+
+    verifyToken() {
+        axios.get(`/api/reset/${this.props.match.params.token}`)
+            .then(() => {
+                this.setState({
+                    tokenIsValid: true
+                });
+            });
     }
 
     render() {
-        if (this.props.error.messages.includes('Invalid or expired token.')) {
+        if (!this.state.tokenIsValid) {
             return this.generateInvalidTokenMessage();
         }
-
+        
+        const {confirmPassword, fieldErrors, password} = this.state;
+        const confirmPasswordError = fieldErrors.confirmPassword;
+        const passwordError = fieldErrors.password;
         return (
             <form onSubmit={this.handleSubmit}>
-                <ul>
-                    {this.props.error.messages.map((message, i) =>
-                        <li key={i}>{message}</li>
-                    )}
-                </ul>
                 <label htmlFor='password'>Password:</label>
                 <input
                     id='password'
-                    onChange={this.handlePasswordChange}
+                    name='password'
+                    onChange={this.handleInputChange}
                     required
                     type='password'
-                    value={this.props.password}
+                    value={password}
                 />
+                {passwordError &&
+                    <p>{passwordError}</p>
+                }
+
                 <label htmlFor='confirmPassword'>Confirm Password</label>
                 <input
                     id='confirmPassword'
-                    onChange={this.handleConfirmPasswordChange}
+                    name='confirmPassword'
+                    onChange={this.handleInputChange}
                     required
                     type='password'
-                    value={this.props.confirmPassword}
+                    value={confirmPassword}
                 />
+                {confirmPasswordError &&
+                    <p>{confirmPasswordError}</p>
+                }
+
                 <input type='submit' value='Update' />
             </form>
-        )
+        );
     }
 }
 
-ResetForm.propTypes = {
-    // profile state
-    error: PropTypes.shape({
-        fields: PropTypes.array.isRequired,
-        messages: PropTypes.array.isRequired
-    }).isRequired,
-    password: PropTypes.string,
-    confirmPassword: PropTypes.string,
-    // profile action creators
-    changeResetFormPassword: PropTypes.func.isRequired,
-    pushResetFormError: PropTypes.func.isRequired,
-    setResetFormConfirmPassword: PropTypes.func.isRequired,
-    setResetFormPassword: PropTypes.func.isRequired,
-    verifyToken: PropTypes.func.isRequired
-};
-
-const mapStateToProps = (state) => ({
-    confirmPassword: state.resetForm.confirmPassword,
-    error: state.resetForm.error,
-    password: state.resetForm.password
-});
-
-export default connect(
-    mapStateToProps,
-    {changeResetFormPassword, pushResetFormError, setResetFormConfirmPassword, setResetFormPassword, verifyToken})
-(ResetForm);
+export default connect(null, {updateStoreWithUser})(ResetForm);
