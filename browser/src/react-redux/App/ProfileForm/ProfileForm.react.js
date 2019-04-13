@@ -1,18 +1,25 @@
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import React, {Component} from 'react';
-import {
-    pushProfileError,
-    resetProfileState,
-    setProfileConfirmPassword,
-    setProfileEmail,
-    setProfileError,
-    setProfileOldPassword,
-    setProfilePassword,
-    updateProfile
-} from './ProfileForm.actions';
+import {updateStoreWithUser} from '../User.actions';
 
 class ProfileForm extends Component {
+
+    static propTypes = {
+        user: PropTypes.shape({
+            _id: PropTypes.string,
+            email: PropTypes.string
+        })
+    };
+
+    state = {
+        confirmPassword: '',
+        email: '',
+        fieldErrors: {},
+        genericError: '',
+        oldPassword: '',
+        password: '',
+    }
 
     componentDidMount = () => {
         this.props.setProfileEmail(this.props.user.email);
@@ -22,20 +29,10 @@ class ProfileForm extends Component {
         this.props.resetProfileState();
     }
 
-    handleConfirmPasswordChange = (e) => {
-        this.props.setProfileConfirmPassword(e.target.value);
-    }
-
-    handleEmailChange = (e) => {
-        this.props.setProfileEmail(e.target.value);
-    };
-
-    handleOldPasswordChange = (e) => {
-        this.props.setProfileOldPassword(e.target.value);
-    }
-
-    handlePasswordChange = (e) => {
-        this.props.setProfilePassword(e.target.value);
+    handleInputChange = ({target: {name, value}}) => {
+        this.setState({
+            [name]: value,
+        });
     };
 
     handleSubmit = (e) => {
@@ -64,6 +61,49 @@ class ProfileForm extends Component {
         this.props.updateProfile({id, ...updatedUser});
     }
 
+    handleSubmit = (e) => {
+        e.preventDefault();
+
+        const {confirmPassword, email, password} = this.state;
+        const passwordsMatch = password === confirmPassword;
+        const fieldErrors = {};
+        if (password && !passwordsMatch) {
+            this.updateFieldErrors({
+                confirmPassword: 'Passwords must match'
+            })
+        } else {
+            this.setState({fieldErrors}, () => this.createUser({email, password}));
+        }
+    }
+
+    updateProfile = () => {
+        const {email, oldPassword, password} = this.state;
+        axios.patch(`/api/user/${id}`, {
+            email,
+            old_password: oldPassword,
+            password
+        })
+            .then((user) => {
+                this.props.updateStoreWithUser(user);
+            })
+            .catch((error) => {
+                const errorBody = error.response.data.error;
+                if (error.response.status === 400) {
+                    const fieldErrors = errorBody.errors;
+                    if (fieldErrors) {
+                        const fieldErrorsState = Object.entries(fieldErrors).reduce((fieldErrorsState, [fieldName, fieldError]) => {
+                            fieldErrorsState[fieldName] = fieldError.message;
+                            return fieldErrorsState;
+                        }, {});
+                        this.updateFieldErrors(fieldErrorsState);
+                    }
+                }
+                this.setState({
+                    genericError: errorBody.message
+                });
+            })
+    }
+
     render() {
         return (
             <form onSubmit={this.handleSubmit}>
@@ -75,14 +115,16 @@ class ProfileForm extends Component {
                 <label htmlFor='email'>Email:</label>
                 <input
                     id='email'
+                    name='email'
                     onChange={this.handleEmailChange}
                     required
                     type='email'
                     value={this.props.email}
                 />
-                <label htmlFor='old_password'>Old Password:</label>
+                <label htmlFor='oldPassword'>Old Password:</label>
                 <input
-                    id='old_password'
+                    id='oldPassword'
+                    name='oldPassword'
                     onChange={this.handleOldPasswordChange}
                     required={Boolean(this.props.password)}
                     type='password'
@@ -91,6 +133,7 @@ class ProfileForm extends Component {
                 <label htmlFor='password'>Password:</label>
                 <input
                     id='password'
+                    name='password'
                     onChange={this.handlePasswordChange}
                     required={Boolean(this.props.confirmPassword)}
                     type='password'
@@ -99,6 +142,7 @@ class ProfileForm extends Component {
                 <label htmlFor='confirmPassword'>Confirm Password</label>
                 <input
                     id='confirmPassword'
+                    name='confirmPassword'
                     onChange={this.handleConfirmPasswordChange}
                     required={Boolean(this.props.password)}
                     type='password'
@@ -110,43 +154,8 @@ class ProfileForm extends Component {
     }
 }
 
-ProfileForm.propTypes = {
-    // profile state
-    email: PropTypes.string,
-    error: PropTypes.shape({
-        fields: PropTypes.array.isRequired,
-        messages: PropTypes.array.isRequired
-    }).isRequired,
-    password: PropTypes.string,
-    confirmPassword: PropTypes.string,
-    // user state
-    user: PropTypes.shape({
-        _id: PropTypes.string,
-        email: PropTypes.string
-    }),
-    // profile action creators
-    pushProfileError: PropTypes.func.isRequired,
-    resetProfileState: PropTypes.func.isRequired,
-    setProfileConfirmPassword: PropTypes.func.isRequired,
-    setProfileEmail: PropTypes.func.isRequired,
-    setProfileError: PropTypes.func.isRequired,
-    setProfileOldPassword: PropTypes.func.isRequired,
-    setProfilePassword: PropTypes.func.isRequired,
-    updateProfile: PropTypes.func.isRequired
-};
-
 const mapStateToProps = (state) => ({
-    // profile state
-    email: state.profileForm.email,
-    error: state.profileForm.error,
-    oldPassword: state.profileForm.oldPassword,
-    password: state.profileForm.password,
-    confirmPassword: state.profileForm.confirmPassword,
-    // user state
     user: state.user
 });
 
-export default connect(
-    mapStateToProps,
-    {pushProfileError, resetProfileState, setProfileConfirmPassword, setProfileEmail, setProfileError, setProfileOldPassword, setProfilePassword, updateProfile}
-)(ProfileForm);
+export default connect(mapStateToProps, {updateStoreWithUser})(ProfileForm);
