@@ -15,9 +15,9 @@ module.exports = merge(common, {
     historyApiFallback: true,
     hot: true,
     proxy: {
-      '/': 'http://localhost:3000',
+      '/': `http://localhost:${process.env.PORT || 3001}`,
     },
-    port: 3001,
+    port: 3000,
     writeToDisk: true,
   },
   plugins: [

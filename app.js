@@ -35,7 +35,7 @@ app.use(express.static('browser/assets'));
 
 app.use('/', router);
 
-app.listen(process.env.PORT || 3000, function() {
+app.listen(process.env.PORT || 3001, function() {
     console.log(chalk.green(`App is listening on port ${this.address().port}`));
 });
 
