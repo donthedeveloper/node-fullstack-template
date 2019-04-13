@@ -26,7 +26,8 @@
     "react-router-dom": "^5.0.0",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
-    "webpack-cli": "^3.3.0"
+    "webpack-cli": "^3.3.0",
+    "webpack-merge": "^4.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.4.0",
@@ -50,8 +51,8 @@
   "scripts": {
     "dev": "npm install && npm run watch",
     "start": "node app.js",
-    "start-dev-backend": "nodemon server.js --ignore ./browser",
-    "start-dev-frontend": "webpack-dev-server --open",
+    "start-dev-backend": "nodemon server.js --ignore ./browser/src --ignore ./browser/public",
+    "start-dev-frontend": "webpack-dev-server --open --config webpack.dev.js",
     "test": "mocha",
     "watch": "npm run start-dev-backend & npm run start-dev-frontend"
   },

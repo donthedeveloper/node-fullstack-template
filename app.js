@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const morgan = require('morgan');
 const session = require('express-session'),
   MongoStore = require('connect-mongo')(session);
+const router = require('./server/routes');
 
 // TODO: put as env variable
 mongoose.connect('mongodb://localhost:27017/fstemplate');
@@ -32,7 +33,6 @@ app.use(bodyParser.json());
 
 app.use(express.static('browser/assets'));
 
-const router = require('./server/routes');
 app.use('/', router);
 
 app.listen(process.env.PORT || 3000, function() {

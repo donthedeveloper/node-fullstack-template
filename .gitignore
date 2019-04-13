@@ -62,4 +62,7 @@ application.css
 bundle.js
 bundle.js.map
 
+# public
+browser/dist
+
 .vscode
