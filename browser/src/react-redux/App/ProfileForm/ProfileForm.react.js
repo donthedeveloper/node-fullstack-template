@@ -1,3 +1,4 @@
+import axios from 'axios';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import React, {Component} from 'react';
@@ -62,52 +63,67 @@ class ProfileForm extends Component {
     //     this.props.updateProfile({id, ...updatedUser});
     // }
 
-    // handleSubmit = (e) => {
-    //     e.preventDefault();
+    handleSubmit = (e) => {
+        e.preventDefault();
 
-    //     const {confirmPassword, email, password} = this.state;
-    //     const passwordsMatch = password === confirmPassword;
-    //     const fieldErrors = {};
-    //     if (password && !passwordsMatch) {
-    //         this.updateFieldErrors({
-    //             confirmPassword: 'Passwords must match'
-    //         })
-    //     } else {
-    //         this.setState({fieldErrors}, () => this.createUser({email, password}));
-    //     }
-    // }
+        const {confirmPassword, password} = this.state;
+        const passwordsMatch = password === confirmPassword;
+        const fieldErrors = {};
+        if (password && !passwordsMatch) {
+            this.updateFieldErrors({
+                confirmPassword: 'Passwords must match'
+            })
+        } else {
+            this.setState({fieldErrors}, () => this.updateProfile());
+        }
+    }
 
-    // updateProfile = () => {
-    //     const {email, oldPassword, password} = this.state;
-    //     axios.patch(`/api/user/${id}`, {
-    //         email,
-    //         old_password: oldPassword,
-    //         password
-    //     })
-    //         .then((user) => {
-    //             this.props.updateStoreWithUser(user);
-    //         })
-    //         .catch((error) => {
-    //             const errorBody = error.response.data.error;
-    //             if (error.response.status === 400) {
-    //                 const fieldErrors = errorBody.errors;
-    //                 if (fieldErrors) {
-    //                     const fieldErrorsState = Object.entries(fieldErrors).reduce((fieldErrorsState, [fieldName, fieldError]) => {
-    //                         fieldErrorsState[fieldName] = fieldError.message;
-    //                         return fieldErrorsState;
-    //                     }, {});
-    //                     this.updateFieldErrors(fieldErrorsState);
-    //                 }
-    //             }
-    //             this.setState({
-    //                 genericError: errorBody.message
-    //             });
-    //         })
-    // }
+    updateProfile = () => {
+        console.log('called');
+        const {email, oldPassword, password} = this.state;
+
+        const updatedUser = {};
+        if (email !== this.props.user.email) {
+            updatedUser.email = email;
+        }
+        if (oldPassword) {
+            updatedUser.oldPassword = oldPassword;
+        }
+        if (password) {
+            updatedUser.password = password;
+        }
+
+        axios.patch(`/api/user/${this.props.user._id}`, updatedUser)
+            .then((user) => {
+                // todo: clear form input and errors in state
+                this.props.updateStoreWithUser(user);
+            })
+            .catch((error) => {
+                const errorBody = error.response.data.error;
+                if (error.response.status === 400) {
+                    const fieldErrors = errorBody.errors;
+                    if (fieldErrors) {
+                        const fieldErrorsState = Object.entries(fieldErrors).reduce((fieldErrorsState, [fieldName, fieldError]) => {
+                            fieldErrorsState[fieldName] = fieldError.message;
+                            return fieldErrorsState;
+                        }, {});
+                        this.updateFieldErrors(fieldErrorsState);
+                    }
+                }
+                this.setState({
+                    genericError: errorBody.message
+                });
+            })
+    }
 
     render() {
-        const {email, confirmPassword, oldPassword, password} = this.props;
-        const {genericError} = this.state;
+        const {email, confirmPassword, oldPassword, password} = this.state;
+        const {fieldErrors, genericError} = this.state;
+        const confirmPasswordError = fieldErrors.confirmPassword;
+        const emailError = fieldErrors.email;
+        const oldPasswordError = fieldErrors.old_password;
+        const passwordError = fieldErrors.password;
+
         return (
             <form onSubmit={this.handleSubmit}>
 
@@ -119,38 +135,46 @@ class ProfileForm extends Component {
                 <input
                     id='email'
                     name='email'
-                    onChange={this.handleEmailChange}
+                    onChange={this.handleInputChange}
                     required
                     type='email'
                     value={email}
                 />
+                {emailError && <p>{emailError}</p>}
+
                 <label htmlFor='oldPassword'>Old Password:</label>
                 <input
                     id='oldPassword'
                     name='oldPassword'
-                    onChange={this.handleOldPasswordChange}
+                    onChange={this.handleInputChange}
                     required={Boolean(password)}
                     type='password'
                     value={oldPassword}
                 />
+                {oldPasswordError && <p>{oldPasswordError}</p>}
+
                 <label htmlFor='password'>Password:</label>
                 <input
                     id='password'
                     name='password'
-                    onChange={this.handlePasswordChange}
+                    onChange={this.handleInputChange}
                     required={Boolean(confirmPassword)}
                     type='password'
                     value={password}
                 />
+                {passwordError && <p>{passwordError}</p>}
+
                 <label htmlFor='confirmPassword'>Confirm Password</label>
                 <input
                     id='confirmPassword'
                     name='confirmPassword'
-                    onChange={this.handleConfirmPasswordChange}
+                    onChange={this.handleInputChange}
                     required={Boolean(password)}
                     type='password'
                     value={confirmPassword}
                 />
+                {confirmPasswordError && <p>{confirmPasswordError}</p>}
+
                 <input type='submit' value='Update' />
             </form>
         );

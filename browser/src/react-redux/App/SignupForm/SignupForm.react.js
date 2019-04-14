@@ -22,7 +22,8 @@ class SignupForm extends Component {
     };
 
     // todo: dont need to pass email and password, just grab state
-    createUser({email, password}) {
+    createUser() {
+        const {email, password} = this.state;
         axios.post('/api/user', {email, password})
             .then((user) => {
                 this.props.updateStoreWithUser(user);
@@ -65,7 +66,7 @@ class SignupForm extends Component {
                 confirmPassword: 'Passwords must match'
             })
         } else {
-            this.setState({fieldErrors}, () => this.createUser({email, password}));
+            this.setState({fieldErrors}, () => this.createUser());
         }
     }
 
