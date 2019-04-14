@@ -1,9 +1,11 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
 import {Switch, Redirect} from 'react-router';
-import {Link, Route} from 'react-router-dom';
+import {Route} from 'react-router-dom';
 import ForgotForm from './ForgotForm/ForgotForm.react';
 import LoginForm from './LoginForm/LoginForm.react';
+import Navigation from './Navigation/Navigation.react';
 import ProfileForm from './ProfileForm/ProfileForm.react';
 import ResetForm from './ResetForm/ResetForm.react';
 import SignupForm from './SignupForm/SignupForm.react';
@@ -21,37 +23,22 @@ const UnauthenticatedRoute = ({isAllowed, ...props}) =>
 
 class App extends React.Component {
 
-    getSnapShotBeforeUpdate = (prevProps) => {
-        if (prevProps.user !== this.props.user) {
-            this.updateWhenUserDoesntExist();
-        }
-    }
+    static propTypes = {
+        user: PropTypes.shape({
+            _id: PropTypes.string,
+            email: PropTypes.string
+        })
+    };
 
     componentDidMount() {
-        this.updateWhenUserDoesntExist();
-    }
-
-    logout = (e) => {
-        e.preventDefault();
-        this.props.logout();
-    }
-
-    updateWhenUserDoesntExist() {
-        if (!this.props.user) {
-            this.props.updateStoreWithUser();
-        }
+        this.props.updateStoreWithUser();
     }
 
     render() {
         const user = this.props.user;
         return (
             <div>
-                <ul>
-                    <li><Link to='/login'>Login</Link></li>
-                    <li><Link to='/signup'>Signup</Link></li>
-                    <li><Link to='/profile'>Profile</Link></li>
-                    <li><a href='' onClick={this.logout}>Logout</a></li>
-                </ul>
+                <Navigation />
                 <Switch>
                     <Route exact path='/' component={null} />
                     <UnauthenticatedRoute
@@ -84,8 +71,6 @@ class App extends React.Component {
         );
     }
 };
-
-// TODO: check user for proptypes
 
 const mapStateToProps = (state) => ({
     user: state.user
