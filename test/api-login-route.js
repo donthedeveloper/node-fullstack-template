@@ -38,13 +38,16 @@ describe('\'/api/login\' Route', () => {
 
         describe('made with a valid email and password', function() {
             const status = 200;
-            it(`responds with status ${status}`, function(done) {
+            it(`responds with a user object and status ${status}`, function(done) {
                 chai.request(app)
                     .post('/api/login')
                     .type('form')
                     .send({email, password})
                     .end((err, res) => {
                         expect(res).to.have.status(200);
+                        expect(res.body).to.have.property('user');
+                        expect(res.body.user).to.be.an('object');
+                        expect(res.body.user.email).to.equal(email);
                         done();
                     });
             });

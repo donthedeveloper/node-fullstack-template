@@ -10,8 +10,12 @@ router.post('/', (req, res, next) => {
 
     return User.authenticate({email, password})
         .then((user) => {
+            const userObj = user.toObject();
+            const {password, resetPassword, ...trimmedUser} = userObj;
             req.session.userId = user._id;
-            res.sendStatus(200);
+            res.json({
+                user: trimmedUser
+            });
         })
         .catch((err) => {
             return next(err);

@@ -35,6 +35,9 @@ class ProfileForm extends Component {
         this.setState({
             [name]: value,
         });
+        this.updateFieldErrors({
+            [name]: ''
+        });
     };
 
     // handleSubmit = (e) => {
@@ -78,8 +81,16 @@ class ProfileForm extends Component {
         }
     }
 
+    updateFieldErrors(fieldErrors) {
+        this.setState({
+            fieldErrors: {
+                ...this.state.fieldErrors,
+                ...fieldErrors
+            }
+        })
+    }
+
     updateProfile = () => {
-        console.log('called');
         const {email, oldPassword, password} = this.state;
 
         const updatedUser = {};
@@ -92,11 +103,16 @@ class ProfileForm extends Component {
         if (password) {
             updatedUser.password = password;
         }
-
+        console.log('user:', this.props.user);
         axios.patch(`/api/user/${this.props.user._id}`, updatedUser)
-            .then((user) => {
-                // todo: clear form input and errors in state
-                this.props.updateStoreWithUser(user);
+            .then(({data}) => {
+                this.props.updateStoreWithUser(data.user);
+                this.setState({
+                    confirmPassword: '',
+                    fieldErrors: {},
+                    oldPassword: '',
+                    password: ''
+                });
             })
             .catch((error) => {
                 const errorBody = error.response.data.error;
@@ -108,11 +124,12 @@ class ProfileForm extends Component {
                             return fieldErrorsState;
                         }, {});
                         this.updateFieldErrors(fieldErrorsState);
+                    } else {
+                        this.setState({
+                            genericError: errorBody.message
+                        });
                     }
                 }
-                this.setState({
-                    genericError: errorBody.message
-                });
             })
     }
 
@@ -136,7 +153,7 @@ class ProfileForm extends Component {
                     id='email'
                     name='email'
                     onChange={this.handleInputChange}
-                    required
+                    // required
                     type='email'
                     value={email}
                 />
@@ -147,7 +164,7 @@ class ProfileForm extends Component {
                     id='oldPassword'
                     name='oldPassword'
                     onChange={this.handleInputChange}
-                    required={Boolean(password)}
+                    // required={Boolean(password)}
                     type='password'
                     value={oldPassword}
                 />
@@ -158,7 +175,7 @@ class ProfileForm extends Component {
                     id='password'
                     name='password'
                     onChange={this.handleInputChange}
-                    required={Boolean(confirmPassword)}
+                    // required={Boolean(confirmPassword)}
                     type='password'
                     value={password}
                 />
@@ -169,7 +186,7 @@ class ProfileForm extends Component {
                     id='confirmPassword'
                     name='confirmPassword'
                     onChange={this.handleInputChange}
-                    required={Boolean(password)}
+                    // required={Boolean(password)}
                     type='password'
                     value={confirmPassword}
                 />

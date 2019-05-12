@@ -26,8 +26,8 @@ class LoginForm extends Component {
     login = () => {
         const {email, password} = this.state;
         axios.post('/api/login', {email, password})
-            .then((user) => {
-                this.props.updateStoreWithUser(user);
+            .then((response) => {
+                this.props.updateStoreWithUser(response.data.user);
             })
             .catch((error) => {
                 this.setState({

@@ -38,11 +38,12 @@ class SignupForm extends Component {
                             return fieldErrorsState;
                         }, {});
                         this.updateFieldErrors(fieldErrorsState);
+                    } else {
+                        this.setState({
+                            genericError: errorBody.message
+                        });
                     }
                 }
-                this.setState({
-                    genericError: errorBody.message
-                });
             })
     }
 
