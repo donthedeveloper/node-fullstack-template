@@ -21,7 +21,7 @@ router.patch('/:userId', async (req, res, next) => {
         fields.email = email;
     }
 
-    const user = await User.findById(userId).select('-password');
+    const user = await User.findById(userId).select('-password -resetPassword');
     if (!user) {
         // TODO: should we even tell them the user exists? maybe just throw a 500
         // TODO: why aren't we simply passing this through to next?
@@ -60,13 +60,17 @@ router.patch('/:userId', async (req, res, next) => {
 router.post('/', (req, res, next) => {
     const {email, password} = req.body;
 
-    User.create({email, password}, (error, user) => {
-        if (error) {
-            return next(error);
-        }
-        req.session.userId = user._id;
-        res.sendStatus(201);
-    });
+    return User.create({email, password})
+        .then((user) => {
+            const userObj = user.toObject();
+            const {password, resetPassword, ...trimmedUser} = userObj;
+            return res.status(201).json({
+                user: trimmedUser
+            });
+        })
+        .catch((err) => {
+            return next(err);
+        });
 });
 
 module.exports = router;
