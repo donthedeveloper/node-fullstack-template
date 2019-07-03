@@ -19,7 +19,7 @@ class ProfileForm extends Component {
         fieldErrors: {},
         genericError: '',
         oldPassword: '',
-        password: '',
+        password: ''
     }
 
     componentDidMount = () => {

@@ -7,7 +7,7 @@ const apiRouter = require('./api');
 router.use('/api', apiRouter);
 
 router.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../../browser/dist/index.html'));
+    res.sendFile(path.join(__dirname, '../../dist/index.html'));
 });
 
 module.exports = router;

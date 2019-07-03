@@ -31,11 +31,12 @@ app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+// TODO: Outside of webpack-dev-server, index is looking for assets in the wrong place. Where SHOULD we put assets?
 app.use(express.static('browser/assets'));
 
 app.use('/', router);
 
-app.listen(process.env.PORT || 3001, function() {
+app.listen(process.env.PORT || 3000, function() {
     console.log(chalk.green(`App is listening on port ${this.address().port}`));
 });
 
