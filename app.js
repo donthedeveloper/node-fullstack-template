@@ -15,6 +15,7 @@ const router = require('./server/routes');
 // TODO: put as env variable
 // mongoose.connect('mongodb://localhost:27017/fstemplate');
 mongoose.connect(process.env.MONGO_URI)
+mongoose.set('useCreateIndex', true);
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 
