@@ -33,7 +33,8 @@ const config = {
   devServer: {
     contentBase: './dist',
     proxy: {
-      '/': `http://localhost:${process.env.PORT || 3000}`
+      '/': `http://localhost:${process.env.PORT || 3000}`,
+      '/graphiql': `http://localhost:${process.env.PORT || 3000}`
     }
   }
 }
