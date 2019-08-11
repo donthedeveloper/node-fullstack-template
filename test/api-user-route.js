@@ -10,95 +10,95 @@ describe('\'/api/user\' Route', function() {
     const emailDuplicateErrorMessage = 'This email address is already taken.';
     const emailEmptyErrorMessage = 'You must provide an email address.';
     const validationErrorName = 'ValidationError';
-    describe('POST Request', function() {
-        const email = 'thisisnotarealemail@gmail.com';
-        const password = 'password';
-        const passwordEmptyErrorMessage = 'You must provide a password.';
+    // describe('POST Request', function() {
+    //     const email = 'thisisnotarealemail@gmail.com';
+    //     const password = 'password';
+    //     const passwordEmptyErrorMessage = 'You must provide a password.';
 
-        describe('made with an empty payload', function() {
-            const status = 400;
-            it(`responds with status ${status} and includes error messages '${emailEmptyErrorMessage}' & '${passwordEmptyErrorMessage}'`, function(done) {
-                chai.request(app)
-                    .post('/api/user')
-                    .type('form')
-                    .send()
-                    .end(function(err, res) {
-                        expect(res).to.have.status(status);
-                        expect(res.body.error.name).to.equal(validationErrorName);
-                        expect(res.body.error.errors.email.message).to.equal(emailEmptyErrorMessage);
-                        expect(res.body.error.errors.password.message).to.equal(passwordEmptyErrorMessage);
-                        done();
-                    });
-            });
-        });
+    //     describe('made with an empty payload', function() {
+    //         const status = 400;
+    //         it(`responds with status ${status} and includes error messages '${emailEmptyErrorMessage}' & '${passwordEmptyErrorMessage}'`, function(done) {
+    //             chai.request(app)
+    //                 .post('/api/user')
+    //                 .type('form')
+    //                 .send()
+    //                 .end(function(err, res) {
+    //                     expect(res).to.have.status(status);
+    //                     expect(res.body.error.name).to.equal(validationErrorName);
+    //                     expect(res.body.error.errors.email.message).to.equal(emailEmptyErrorMessage);
+    //                     expect(res.body.error.errors.password.message).to.equal(passwordEmptyErrorMessage);
+    //                     done();
+    //                 });
+    //         });
+    //     });
 
-        describe('made without an email address', function() {
-            const status = 400;
-            it(`responds with status ${status} and includes message '${emailEmptyErrorMessage}'`, function(done) {
-                chai.request(app)
-                    .post('/api/user')
-                    .type('form')
-                    .send({password})
-                    .end(function(err, res) {
-                        expect(res).to.have.status(status);
-                        expect(res.body.error.name).to.equal(validationErrorName);
-                        expect(res.body.error.errors.email.message).to.equal(emailEmptyErrorMessage);
-                        done();
-                    });
-            });
-        });
+    //     describe('made without an email address', function() {
+    //         const status = 400;
+    //         it(`responds with status ${status} and includes message '${emailEmptyErrorMessage}'`, function(done) {
+    //             chai.request(app)
+    //                 .post('/api/user')
+    //                 .type('form')
+    //                 .send({password})
+    //                 .end(function(err, res) {
+    //                     expect(res).to.have.status(status);
+    //                     expect(res.body.error.name).to.equal(validationErrorName);
+    //                     expect(res.body.error.errors.email.message).to.equal(emailEmptyErrorMessage);
+    //                     done();
+    //                 });
+    //         });
+    //     });
 
-        describe('made without a password', function() {
-            const status = 400;
-            it(`responds with status ${status} and includes message '${passwordEmptyErrorMessage}'`, function(done) {
-                chai.request(app)
-                    .post('/api/user')
-                    .type('form')
-                    .send({email})
-                    .end(function(err, res) {
-                        expect(res).to.have.status(status);
-                        expect(res.body.error.name).to.equal(validationErrorName);
-                        expect(res.body.error.errors.password.message).to.equal(passwordEmptyErrorMessage);
-                        done();
-                    });
-            });
-        });
+    //     describe('made without a password', function() {
+    //         const status = 400;
+    //         it(`responds with status ${status} and includes message '${passwordEmptyErrorMessage}'`, function(done) {
+    //             chai.request(app)
+    //                 .post('/api/user')
+    //                 .type('form')
+    //                 .send({email})
+    //                 .end(function(err, res) {
+    //                     expect(res).to.have.status(status);
+    //                     expect(res.body.error.name).to.equal(validationErrorName);
+    //                     expect(res.body.error.errors.password.message).to.equal(passwordEmptyErrorMessage);
+    //                     done();
+    //                 });
+    //         });
+    //     });
 
-        describe('made with all necessary fields', function() {
-            const status = 201;
-            it(`responds with status ${status}`, async function() {
-                const userCreate = await chai.request(app)
-                    .post('/api/user')
-                    .type('form')
-                    .send({email, password});
-                expect(userCreate).to.have.status(status);
+    //     describe('made with all necessary fields', function() {
+    //         const status = 201;
+    //         it(`responds with status ${status}`, async function() {
+    //             const userCreate = await chai.request(app)
+    //                 .post('/api/user')
+    //                 .type('form')
+    //                 .send({email, password});
+    //             expect(userCreate).to.have.status(status);
 
-                const user = await User.findOne({email});
-                expect(user).to.include({email});
-            });
-        });
+    //             const user = await User.findOne({email});
+    //             expect(user).to.include({email});
+    //         });
+    //     });
 
-        describe('made with duplicate email, which should be unique', function() {
-            const status = 400;
-            it(`responds with a status of ${status} and includes message '${emailDuplicateErrorMessage}'`, async function() {
-                await User.create({email, password});
+    //     describe('made with duplicate email, which should be unique', function() {
+    //         const status = 400;
+    //         it(`responds with a status of ${status} and includes message '${emailDuplicateErrorMessage}'`, async function() {
+    //             await User.create({email, password});
 
-                return chai.request(app)
-                    .post('/api/user')
-                    .type('form')
-                    .send({email, password})
-                        .catch((error) => {
-                            expect(error).to.have.status(status);
-                            expect(error.response.body.error.name).to.equal(validationErrorName);
-                            expect(error.response.body.error.errors.email.message).to.equal(emailDuplicateErrorMessage);
-                        });
-            });
-        });
+    //             return chai.request(app)
+    //                 .post('/api/user')
+    //                 .type('form')
+    //                 .send({email, password})
+    //                     .catch((error) => {
+    //                         expect(error).to.have.status(status);
+    //                         expect(error.response.body.error.name).to.equal(validationErrorName);
+    //                         expect(error.response.body.error.errors.email.message).to.equal(emailDuplicateErrorMessage);
+    //                     });
+    //         });
+    //     });
 
-        afterEach(function() {
-            return User.remove({email});
-        });
-    });
+    //     afterEach(function() {
+    //         return User.remove({email});
+    //     });
+    // });
 
     describe('PATCH Request', function() {
         const emailToChangeTo = 'thisisnotarealemail3@gmail.com';

@@ -8,6 +8,7 @@ const {
     GraphQLString
 } = graphql;
 
+const Permission = require('../models/permission/permission');
 const User = require('../models/user');
 
 const PermissionType = new GraphQLObjectType({
@@ -86,6 +87,33 @@ const RootQuery = new GraphQLObjectType({
 
 const mutation = new GraphQLObjectType({
     fields: {
+        addPermission: {
+            args: {
+                name: {
+                    type: new GraphQLNonNull(GraphQLString)
+                }
+            },
+            resolve(parentValue, { name }) {
+                return Permission.create({
+                    name
+                });
+            },
+            type: PermissionType
+        },
+        deletePermission: {
+            args: {
+                id: {
+                    type: new GraphQLNonNull(GraphQLString)
+                }
+            },
+            // todo: this probably should resolve with the id of the deleted, but we should confirm that it was deleted
+            resolve(parentValue, { id }) {
+                return Permission.deleteOne({
+                    id
+                });
+            },
+            type: PermissionType
+        },
         addUser: {
             args: {
                 email: {

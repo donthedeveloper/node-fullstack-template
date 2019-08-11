@@ -4,10 +4,7 @@ const uniqueValidator = require('mongoose-unique-validator');
 
 const PermissionSchema = new mongoose.Schema({
     name: {
-        required: [
-            true,
-            'You must provide a name.'
-        ],
+        required: true,
         trim: true,
         type: String,
         unique: true,
