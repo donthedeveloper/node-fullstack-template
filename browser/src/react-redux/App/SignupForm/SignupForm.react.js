@@ -1,7 +1,6 @@
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
 import {updateStoreWithUser} from '../User.actions';
 
 class SignupForm extends Component {
@@ -138,8 +137,4 @@ class SignupForm extends Component {
     }
 }
 
-const mapStateToProps = (state) => ({
-    user: state.user
-});
-
-export default connect(mapStateToProps, {updateStoreWithUser})(SignupForm);
+export default SignupForm;

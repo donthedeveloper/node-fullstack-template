@@ -1,17 +1,18 @@
+import ApolloClient from 'apollo-client';
 import React from 'react';
+import {ApolloProvider} from 'react-apollo';
 import ReactDOM from 'react-dom';
 import {Route, BrowserRouter} from 'react-router-dom';
-import {Provider} from 'react-redux';
-import store from './store';
+import App from './App/App.react';
 import './index.scss';
 
-import App from './App/App.react';
+const client = new ApolloClient({});
 
 ReactDOM.render(
-    <Provider store={store}>
+    <ApolloProvider client={client}>
         <BrowserRouter>
             <Route path='/' component={App} />
         </BrowserRouter>
-    </Provider>,
+    </ApolloProvider>,
     document.getElementById('app')
 );

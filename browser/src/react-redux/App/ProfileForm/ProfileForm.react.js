@@ -1,8 +1,17 @@
 import axios from 'axios';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
 import React, {Component} from 'react';
 import {updateStoreWithUser} from '../User.actions';
+
+import gql from 'graphql-tag';
+import { graphql } from 'react-apollo';
+const query = gql`
+    {
+        user {
+            email
+        }
+    }
+`;
 
 class ProfileForm extends Component {
 
@@ -197,8 +206,4 @@ class ProfileForm extends Component {
     }
 }
 
-const mapStateToProps = (state) => ({
-    user: state.user
-});
-
-export default connect(mapStateToProps, {updateStoreWithUser})(ProfileForm);
+export default graphql(query)(ProfileForm);

@@ -1,6 +1,5 @@
 import axios from 'axios';
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
 import {updateStoreWithUser} from '../User.actions';
 
@@ -88,4 +87,4 @@ class LoginForm extends Component {
     }
 }
 
-export default connect(null, {updateStoreWithUser})(LoginForm);
+export default LoginForm;

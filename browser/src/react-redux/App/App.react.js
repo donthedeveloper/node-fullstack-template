@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import {connect} from 'react-redux';
 import {Switch, Redirect} from 'react-router';
 import {Route} from 'react-router-dom';
 import ForgotForm from './ForgotForm/ForgotForm.react';
@@ -72,8 +71,4 @@ class App extends React.Component {
     }
 };
 
-const mapStateToProps = (state) => ({
-    user: state.user
-});
-
-export default connect(mapStateToProps, {logout, updateStoreWithUser})(App);
+export default App;

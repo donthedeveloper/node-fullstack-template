@@ -6,11 +6,13 @@ const express = require('express'),
 const expressGraphQL = require('express-graphql');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
+const passport = require('passport');
 const session = require('express-session'),
   MongoStore = require('connect-mongo')(session);
 
-const schema = require('./server/schema');
+const passportConfig = require('./services/auth');
 const router = require('./server/routes');
+const schema = require('./server/schema');
 
 // TODO: put as env variable
 // mongoose.connect('mongodb://localhost:27017/fstemplate');
@@ -38,6 +40,9 @@ app.use(bodyParser.json());
 
 // TODO: Outside of webpack-dev-server, index is looking for assets in the wrong place. Where SHOULD we put assets?
 app.use(express.static('browser/assets'));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use('/graphql', expressGraphQL({
   schema,
