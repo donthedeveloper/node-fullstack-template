@@ -1,5 +1,5 @@
 const chai = require('chai');
-const app = require('../../../app');
+
 const expect = chai.expect;
 const Permission = require('./permission');
 
@@ -125,7 +125,4 @@ describe('Permission', function() {
             }
         });
     });
-    // todo: test looking up permissions
-    // todo: test deleting permissions
-    // todo: test ie8
 });

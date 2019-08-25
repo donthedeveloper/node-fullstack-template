@@ -4,7 +4,7 @@ const chalk = require('chalk');
 const app = require('../app');
 const expect = chai.expect;
 chai.use(chaiHttp);
-const User = require('../server/models/user');
+const User = require('../server/models/user/user');
 
 // TODO: re-run tests whenever a code change happens in the app
 

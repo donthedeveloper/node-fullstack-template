@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const express = require('express'),
     router = express.Router();
 const nodemailer = require('nodemailer');
-const User = require('../../models/user');
+const User = require('../../models/user/user');
 
 router.post('/', async (req, res, next) => {
     const email = req.body.email;

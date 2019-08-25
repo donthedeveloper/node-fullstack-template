@@ -114,7 +114,7 @@ class ProfileForm extends Component {
         }
         axios.patch(`/api/user/${this.props.user._id}`, updatedUser)
             .then(({data}) => {
-                this.props.updateStoreWithUser(data.user);
+                // this.props.updateStoreWithUser(data.user);
                 this.setState({
                     confirmPassword: '',
                     fieldErrors: {},

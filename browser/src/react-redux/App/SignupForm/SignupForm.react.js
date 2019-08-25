@@ -25,7 +25,7 @@ class SignupForm extends Component {
         const {email, password} = this.state;
         axios.post('/api/user', {email, password})
             .then((response) => {
-                this.props.updateStoreWithUser(response.data.user);
+                // this.props.updateStoreWithUser(response.data.user);
             })
             .catch((error) => {
                 const errorBody = error.response.data.error;

@@ -9,7 +9,7 @@ const {
 } = graphql;
 
 const Permission = require('../models/permission/permission');
-const User = require('../models/user');
+const User = require('../models/user/user');
 
 const PermissionType = new GraphQLObjectType({
     fields: () => ({
@@ -64,10 +64,17 @@ const RootQuery = new GraphQLObjectType({
                 }
             },
             resolve(parentValue, { id }) {
-                return axios.get(`http://localhost:3001/permissions/${id}`)
-                    .then(response => response.data);
+                return Permission.findOne({
+                    _id: id
+                })
             },
             type: PermissionType
+        },
+        permissions: {
+            resolve() {
+                return Permission.find();
+            },
+            type: GraphQLList(PermissionType)
         },
         user: {
             args: {
@@ -109,11 +116,30 @@ const mutation = new GraphQLObjectType({
             // todo: this probably should resolve with the id of the deleted, but we should confirm that it was deleted
             resolve(parentValue, { id }) {
                 return Permission.deleteOne({
-                    id
-                });
+                    _id: id
+                })
             },
             type: PermissionType
         },
+        // updatePermission: {
+        //     args: {
+        //         id: {
+        //             type: new GraphQLNonNull(GraphQLString)
+        //         },
+        //         input: PermissionType
+        //     },
+        //     async resolve(parentValue, { id, input }) {
+        //         const permission = await Permission.findOne({
+        //             _id: id
+        //         });
+        //         return Permission.updateOne({
+        //             where: {
+        //                 _id: 'id'
+        //             }
+        //         }, input);
+        //     },
+        //     type: PermissionType
+        // },
         addUser: {
             args: {
                 email: {

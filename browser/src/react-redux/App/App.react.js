@@ -30,7 +30,7 @@ class App extends React.Component {
     };
 
     componentDidMount() {
-        this.props.updateStoreWithUser();
+        // this.props.updateStoreWithUser();
     }
 
     render() {

@@ -1,7 +1,7 @@
 const chalk = require('chalk');
 const express = require('express'),
     router = express.Router();
-const User = require('../../models/user');
+const User = require('../../models/user/user');
 
 router.get('/:token', (req, res, next) => {
     return User.findOne({

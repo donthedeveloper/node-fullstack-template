@@ -6,13 +6,13 @@ import {Route, BrowserRouter} from 'react-router-dom';
 import App from './App/App.react';
 import './index.scss';
 
-const client = new ApolloClient({});
+// const client = new ApolloClient({});
 
 ReactDOM.render(
-    <ApolloProvider client={client}>
+    // <ApolloProvider client={client}>
         <BrowserRouter>
             <Route path='/' component={App} />
-        </BrowserRouter>
-    </ApolloProvider>,
+        </BrowserRouter>,
+    // </ApolloProvider>,
     document.getElementById('app')
 );

@@ -1,7 +1,7 @@
 const express = require('express'),
     router = express.Router();
 const mongoose = require('mongoose');
-const User = require('../../models/user');
+const User = require('../../models/user/user');
 
 router.patch('/:userId', async (req, res, next) => {
     const {email, password} = req.body;

@@ -24,7 +24,7 @@ class ResetForm extends Component {
                     confirmPassword: '',
                     password: ''
                 });
-                this.props.updateStoreWithUser();
+                // this.props.updateStoreWithUser();
             })
             .catch((error) => {
                 const errorBody = error.response.data.error;
