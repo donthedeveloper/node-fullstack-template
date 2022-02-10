@@ -40,7 +40,7 @@
     "chai-http": "^4.2.1",
     "css-loader": "^2.1.1",
     "mocha": "^6.0.2",
-    "node-sass": "^4.11.0",
+    "node-sass": "^7.0.0",
     "nodemon": "^1.18.10",
     "redux-devtools-extension": "^2.13.8",
     "redux-logger": "^3.0.6",
