@@ -39,7 +39,7 @@
     "chai": "^4.2.0",
     "chai-http": "^4.2.1",
     "css-loader": "^2.1.1",
-    "mocha": "^6.0.2",
+    "mocha": "^10.2.0",
     "node-sass": "^4.11.0",
     "nodemon": "^1.18.10",
     "redux-devtools-extension": "^2.13.8",
